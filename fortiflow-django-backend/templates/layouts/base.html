@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %} | FortiFlow</title>
+    {% load static %}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-base-200 p-4">
+        <div class="text-2xl font-bold mb-4">FortiFlow</div>
+        <ul class="menu">
+        <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+        <li><a href="{% url 'user-list' %}" class="{% if request.resolver_match.url_name == 'users' %}active{% endif %}">Usuarios</a></li>
+        <li><a>Clientes</a></li>
+        <li><a>Portafolios</a></li>
+        <li><a>Programas</a></li>
+        <li><a>Notificaciones</a></li>
+        </ul>
+    </aside>
+
+    <main class="flex-1 p-6 bg-base-100 overflow-y-auto">
+        <div class="navbar bg-base-100 shadow-sm mb-4">
+            <div class="flex-1">
+              <!-- <a class="btn btn-ghost text-xl">FortiFlow</a>-->
+            </div>
+            <div class="flex gap-2">
+              <input type="text" placeholder="Buscar..." class="input input-bordered w-24 md:w-auto" />
+              <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                  <div class="w-10 rounded-full">
+                    <i class="fa-solid fa-user"></i>
+                  </div>
+                </div>
+                <ul
+                  tabindex="0"
+                  class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+                  <li>
+                    <a class="justify-between">
+                      Perfil
+                    </a>
+                  </li>
+                  <li><a>Configuración</a></li>
+                  <li x-data="{
+                    logout() {
+                        fetch('/api/users/logout/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        })
+                        .then(() => {
+                            window.location.href = '/login/';
+                        })
+                        .catch(() => {
+                            console.error('Error al cerrar sesión');
+                        });
+                    }
+                  }"><button @click="logout">Salir</button></li>
+                </ul>
+              </div>
+            </div>
+        </div>
+        {% block content %}{% endblock %}
+    </main>
+    {% block scripts %}{% endblock %}
+    <script>
+      function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  // cookie.startsWith(name + '=')
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+  
+      const csrfToken = getCookie('csrftoken');
+  
+      document.body.addEventListener('htmx:configRequest', (event) => {
+          event.detail.headers['X-CSRFToken'] = csrfToken;
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+{% extends "layouts/auth.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-md p-8 space-y-6 bg-white shadow-xl rounded-2xl" id="content-login">
+    <h2 class="text-3xl font-bold text-center text-gray-800">Iniciar Sesión</h2>
+
+    <form 
+        method="POST"
+        hx-post="{% url 'custom-login' %}"
+        hx-target="#content-login" 
+        hx-swap="outerHTML"
+        id="login-form"
+    >
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-error shadow-lg mb-4">
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <div>
+                {% for error in form.non_field_errors %}
+                  <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+        <div>
+            <label class="label">
+                <span class="label-text">Nombre de usuario</span>
+            </label>
+            {{ form.username }}
+            {% for error in form.user.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div>
+            <label class="label">
+                <span class="label-text">Contraseña</span>
+            </label>
+            {{ form.password }}
+            {% for error in form.password.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="flex items-center justify-between">
+            <label class="cursor-pointer label">
+                <span class="label-text">Recordarme</span> 
+                <input type="checkbox" name="remember_me" class="checkbox checkbox-primary ml-2"/>
+            </label>
+            <a href="#" class="text-sm text-blue-500 hover:underline">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full">
+            <span>Entrar</span>
+        </button>
+    </form>
+
+    <p class="text-center text-sm text-gray-600">
+        ¿No tienes una cuenta? <a href="#" class="text-blue-500 hover:underline">Regístrate</a>
+    </p>
+</div>
+
+<script>
+  document.body.addEventListener("htmx:afterOnLoad", function(evt) {
+      const response = evt.detail.xhr.response;
+      try {
+          const data = JSON.parse(response);
+          if (data.redirect) {
+              window.location.href = data.redirect;
+          }
+      } catch (e) {
+          
+      }
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,69 @@
+{% load pagination_tags %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Nombre de usuario</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Correo</th>
+            <th>Grupo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            <tr>
+                <th>{{ user.id }}</th>
+                <td>{{ user.username }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% for g in user.groups.all %}
+                        <span class="badge">{{ g.name }}</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    <button class="btn btn-primary btn-xs" hx-get="{% url 'user-edit' user.id %}" hx-target="#modal-edit-form-content" hx-trigger="click" onclick="edit_user_modal.showModal()">Editar</button>
+                    <button class="btn btn-error btn-xs" onclick="confirmDeleteUser({{ user.id }})">Eliminar</button>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if is_paginated %}
+    {% smart_pagination page_obj "#tabla-usuarios" %}
+{% endif %}
+
+<script>
+    function confirmDeleteUser(userId) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Esta acción eliminará al usuario permanentemente.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                htmx.ajax('DELETE', `/account/delete/${userId}/`, {
+                    target: 'body',
+                    swap: 'none'  
+                });
+            }
+        });
+    }
+
+    document.body.addEventListener('userDeleted', () => {
+        htmx.trigger('body', 'userUpdated');
+        Swal.fire(
+            'Eliminado',
+            'El usuario ha sido eliminado.',
+            'success'
+        );
+    });
+</script>

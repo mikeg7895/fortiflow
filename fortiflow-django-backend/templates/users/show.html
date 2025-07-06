@@ -1,0 +1,28 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Usuarios{% endblock %}
+
+{% block title-header %}Usuarios{% endblock %}
+
+{% block content %}
+<div class="card card-border bg-base-100">  
+    <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title">Usuarios</h2>
+            <button class="btn btn-primary" onclick="add_user_modal.showModal()">Agregar</button>
+        </div>
+        <div class="overflow-x-auto">
+            <div id="tabla-usuarios"
+                 hx-get="{% url 'user-list' %}" 
+                 hx-trigger="load, userCreated from:body, reload-table from:body"
+                 hx-target="#tabla-usuarios" 
+                 hx-swap="innerHTML">
+                Cargando usuarios...
+            </div>
+        </div>
+    </div>
+
+    {% include "users/create_modal.html" %}
+    {% include "users/edit_modal.html" %}
+</div>
+{% endblock %}
