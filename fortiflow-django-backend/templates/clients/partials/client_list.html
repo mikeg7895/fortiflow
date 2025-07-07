@@ -1,0 +1,66 @@
+{% load pagination_tags %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Nombre</th>
+            <th>Logo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+            <tr>
+                <th>{{ client.id }}</th>
+                <td>{{ client.name }}</td>
+                <td>
+                    <img src="{{ client.logo.url }}" alt="" class="w-16 h-16 object-cover">
+                </td>
+                <td>
+                    <button class="btn btn-primary btn-xs" hx-get="{% url 'client-edit' client.id %}" hx-target="#modal-edit-form-content" hx-trigger="click" onclick="edit_client_modal.showModal()">Editar</button>
+                    <button class="btn btn-primary btn-xs" hx-get="{% url 'contract-list' client.id %}" hx-target="#lista-contratos" hx-trigger="click" onclick="list_contract_modal.showModal()">Portafolio</button>
+                    <button class="btn btn-error btn-xs" onclick="confirmDeleteClient({{ client.id }})">Eliminar</button>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">No hay clientes</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if is_paginated %}
+    {% smart_pagination page_obj "#tabla-clientes" %}
+{% endif %}
+
+<script>
+    function confirmDeleteClient(userId) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Esta acción eliminará al cliente permanentemente.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                htmx.ajax('DELETE', `/clients/delete/${userId}/`, {
+                    target: 'body',
+                    swap: 'none'  
+                });
+            }
+        });
+    }
+
+    document.body.addEventListener('clientDeleted', () => {
+        htmx.trigger('body', 'clientUpdated');
+        Swal.fire(
+            'Eliminado',
+            'El cliente ha sido eliminado.',
+            'success'
+        );
+    });
+</script>

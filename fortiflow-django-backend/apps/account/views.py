@@ -34,6 +34,11 @@ class UserCreateView(LoginRequiredMixin, CreateView):
     form_class = CustomUserCreationForm
     template_name = "users/partials/user_create.html"
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+    
     def form_valid(self, form):
         response = super().form_valid(form)
         if self.request.headers.get('HX-Request'):
@@ -68,7 +73,6 @@ class UserListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = CustomUserCreationForm()
         return context
 
 

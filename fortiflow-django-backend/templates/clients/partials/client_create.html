@@ -1,0 +1,76 @@
+<h3 class="text-lg font-bold">Crear cliente</h3>
+<form method="post" hx-post="{% url 'client-create' %}" hx-target="#modal-form-content" class="space-y-4 mt-5" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    {% if form.non_field_errors %}
+    <div class="alert alert-error shadow-lg mb-4">
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.name.id_for_label }}">
+                <span class="label-text">{{ form.name.label }}</span>
+            </label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.name.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.logo.id_for_label }}">
+                <span class="label-text">{{ form.logo.label }}</span>
+            </label>
+            {{ form.logo }}
+            {% if form.logo.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.logo.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="modal-action">
+        <button type="button" class="btn btn-ghost" onclick="add_client_modal.close()">
+            Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <span class="loading loading-spinner loading-sm" id="submit-spinner"></span>
+            Guardar Cliente
+        </button>
+    </div>
+</form>
+
+<script>
+    document.querySelector('form').addEventListener('htmx:beforeRequest', function() {
+        document.getElementById('submit-spinner').classList.remove('hidden');
+    });
+
+    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+        const status = evt.detail.xhr.status;
+        if (status === 204) {
+            add_client_modal.close();
+            Swal.fire(
+                'Cliente creado',
+                'El cliente ha sido creado exitosamente.',
+                'success'
+            );
+            htmx.trigger('#tabla-clientes', 'reload-table');
+        }
+
+        document.getElementById('submit-spinner').classList.add('hidden');
+    });
+</script>

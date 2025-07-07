@@ -126,6 +126,11 @@
         const status = evt.detail.xhr.status;
         if (status === 204) {
             add_user_modal.close();
+            Swal.fire(
+                'Usuario creado',
+                'El usuario ha sido creado exitosamente.',
+                'success'
+            );
             htmx.trigger('#tabla-usuarios', 'reload-table');
         }
 

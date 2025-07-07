@@ -70,7 +70,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'apps.account.middleware.RefreshTokenMiddleware',
 ]
 
 # Configuración de CORS
@@ -291,3 +290,4 @@ STATICFILES_DIRS = [
 ]
 
 AUTH_USER_MODEL = 'account.CustomUser'
+LOGIN_URL = '/account/login/' 

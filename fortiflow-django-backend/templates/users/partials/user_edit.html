@@ -125,6 +125,11 @@
         const status = evt.detail.xhr.status;
         if (status === 204) {
             edit_user_modal.close();
+            Swal.fire(
+                'Usuario actualizado',
+                'El usuario ha sido actualizado exitosamente.',
+                'success'
+            );
             htmx.trigger('#tabla-usuarios', 'reload-table');
         }
 

@@ -1,0 +1,31 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Clientes{% endblock %}
+
+{% block title-header %}Clientes{% endblock %}
+
+{% block content %}
+<div class="card card-border bg-base-100">  
+    <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title">Clientes</h2>
+            <button class="btn btn-primary" onclick="add_client_modal.showModal()">Agregar</button>
+        </div>
+        <div class="overflow-x-auto">
+            <div id="tabla-clientes"
+                 hx-get="{% url 'client-list' %}" 
+                 hx-trigger="load, clientCreated from:body, reload-table from:body"
+                 hx-target="#tabla-clientes" 
+                 hx-swap="innerHTML">
+                Cargando clientes...
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include "clients/create_modal.html" %}
+{% include "clients/edit_modal.html" %}
+{% include "clients/contract_modal.html" %}
+{% include "clients/create_contract_modal.html" %}
+{% include "clients/edit_contract_modal.html" %}
+{% endblock %}

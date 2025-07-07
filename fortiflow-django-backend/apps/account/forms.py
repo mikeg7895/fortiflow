@@ -147,8 +147,15 @@ class CustomUserCreationForm(UserCreationForm):
             raise forms.ValidationError('Este correo electrónico ya está en uso.')
         return email
     
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+
     def save(self, commit=True):
         user = super().save(commit=False)
+        if hasattr(self.request.user, 'tenant'):
+            user.tenant = self.request.user.tenant
+            
         if commit:
             user.save()
             group = self.cleaned_data.get('group')

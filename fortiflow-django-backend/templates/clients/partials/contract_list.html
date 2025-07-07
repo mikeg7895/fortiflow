@@ -1,0 +1,72 @@
+{% load pagination_tags %}
+<button class="btn btn-primary" hx-get="{% url 'contract-create' client.id %}" hx-target="#modal-contract-form-content" hx-trigger="click"  onclick="
+list_contract_modal.close();
+create_contract_modal.showModal();
+">Agregar</button>
+<table class="table mt-5">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Fecha de inicio</th>
+            <th>Fecha de finalización</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for contract in contracts %}
+            <tr>
+                <th>{{ contract.id }}</th>
+                <td>{{ contract.start_date }}</td>
+                <td>{{ contract.end_date }}</td>
+                <td>
+                    <button class="btn btn-primary btn-xs" hx-get="{% url 'contract-edit' contract.id %}" hx-target="#modal-contract-edit-form-content" hx-trigger="click" onclick="edit_contract_modal.showModal(); list_contract_modal.close();">Editar</button>
+                    <a class="btn btn-primary btn-xs" href="{% url 'portfolio-list' contract.id %}">Ver</a>
+                    <button class="btn btn-error btn-xs" onclick="confirmDeleteContract({{ contract.id }})">Eliminar</button>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">No hay contratos</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if is_paginated %}
+    {% smart_pagination page_obj "#tabla-contratos" %}
+{% endif %}
+
+<script>
+    function confirmDeleteContract(userId) {
+        list_contract_modal.close();
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Esta acción eliminará el contrato permanentemente.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                htmx.ajax('DELETE', `/clients/contract/delete/${userId}/`, {
+                    target: 'body',
+                    swap: 'none'  
+                });
+            }else{
+                list_contract_modal.showModal();
+            }
+        });
+    }
+
+    document.body.addEventListener('contractDeleted', () => {
+        htmx.trigger('body', 'contractUpdated');
+        Swal.fire(
+            'Eliminado',
+            'El contrato ha sido eliminado.',
+            'success'
+        ).then(() => {
+            list_contract_modal.showModal();
+        });
+    });
+</script>   

@@ -1,0 +1,65 @@
+{% load pagination_tags %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Estado</th>  
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for portfolio in portfolios %}
+            <tr>
+                <th>{{ portfolio.id }}</th>
+                <td>{{ portfolio.name }}</td>
+                <td>{{ portfolio.description }}</td>
+                <td>{{ portfolio.status }}</td>
+                <td>
+                    <button class="btn btn-primary btn-xs" hx-get="#" hx-target="#modal-edit-form-content" hx-trigger="click" onclick="edit_portfolio_modal.showModal()">Editar</button>
+                    <button class="btn btn-error btn-xs" onclick="confirmDeletePortfolio({{ portfolio.id }})">Eliminar</button>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">No hay portafolios</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if is_paginated %}
+    {% smart_pagination page_obj "#tabla-clientes" %}
+{% endif %}
+
+<script>
+    function confirmDeletePortfolio(userId) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Esta acción eliminará el portafolio permanentemente.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                htmx.ajax('DELETE', `/portfolio/delete/${userId}/`, {
+                    target: 'body',
+                    swap: 'none'  
+                });
+            }
+        });
+    }
+
+    document.body.addEventListener('portfolioDeleted', () => {
+        htmx.trigger('body', 'portfolioUpdated');
+        Swal.fire(
+            'Eliminado',
+            'El portafolio ha sido eliminado.',
+            'success'
+        );
+    });
+</script>
