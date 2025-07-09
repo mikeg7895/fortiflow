@@ -1,11 +1,39 @@
 {% load pagination_tags %}
 
+<form method="get" hx-get="{% url 'portfolio-list-general' %}" hx-trigger="change" hx-target="#tabla-portafolio-general" hx-swap="innerHTML" class="flex gap-4 items-center mb-4">
+    <div>
+        <label>Cliente: {{ selected_client_id }}</label>
+        <select name="cliente_id" class="form-control">
+            <option value="">Todos</option>
+            {% for client in clients %}
+                <option value="{{ client.id }}" {% if client.id|stringformat:"s" == selected_client_id %}selected{% endif %}>
+                    {{ client.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label>Contrato:</label>
+        <select name="contrato_id" class="form-control">
+            <option value="">Todos</option>
+            {% for contract in contracts %}
+                <option value="{{ contract.id }}" {% if contract.id|stringformat:"s" == selected_contract_id %}selected{% endif %}>
+                    {{ contract.start_date }} - {{ contract.end_date }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th></th>
             <th>Nombre</th>
             <th>Descripción</th>
+            <th>Cliente</th>
+            <th>Contrato</th>
             <th>Total obligaciones</th>
             <th>Total deudores</th>
             <th>% Mora</th>
@@ -19,19 +47,21 @@
                 <th>{{ portfolio.id }}</th>
                 <td>{{ portfolio.name }}</td>
                 <td>{{ portfolio.description|truncatechars:30 }}</td>
+                <td>{{ portfolio.contract.client.name }}</td>
+                <td>{{ portfolio.contract.start_date }} - {{ portfolio.contract.end_date }}</td>
                 <td>{{ portfolio.obligations.count }}</td>
                 <td>{{ portfolio.debtors_count }}</td>
                 <td>{{ portfolio.delinquency_percentage }}%</td>
                 <td>{{ portfolio.status }}</td>
                 <td>
                     <a class="btn btn-primary btn-xs" href="#">Ver</a>
-                    <button class="btn btn-primary btn-xs" hx-get="{% url 'portfolio-edit' portfolio.id contract.id %}" hx-target="#modal-edit-form-content" hx-trigger="click" onclick="edit_portfolio_modal.showModal()">Editar</button>
+                    <button class="btn btn-primary btn-xs" hx-get="{% url 'portfolio-edit' portfolio.id portfolio.contract.id %}" hx-target="#modal-edit-form-content" hx-trigger="click" onclick="edit_portfolio_modal.showModal()">Editar</button>
                     <button class="btn btn-error btn-xs" onclick="confirmDeletePortfolio({{ portfolio.id }})">Eliminar</button>
                 </td>
             </tr>
         {% empty %}
             <tr>
-                <td colspan="4">No hay portafolios</td>
+                <td colspan="10">No hay portafolios</td>
             </tr>
         {% endfor %}
     </tbody>

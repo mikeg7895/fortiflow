@@ -1,6 +1,6 @@
 from django.db import models
 from apps.account.models import CustomUser
-from apps.portfolio.models import Deptor
+from apps.portfolio.models import Debtor
 
 
 class Program(models.Model):
@@ -19,7 +19,7 @@ class Program(models.Model):
 class Assignment(models.Model):
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="assignments")
     agent = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="assignments")
-    deptor = models.ForeignKey(Deptor, on_delete=models.CASCADE, related_name="assignments")
+    debtor = models.ForeignKey(Debtor, on_delete=models.CASCADE, related_name="assignments")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -8,18 +8,17 @@
 <div class="card card-border bg-base-100">  
     <div class="card-body">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="card-title">Portafolio {{ contract.client.name }}</h2>
+            <h2 class="card-title">Portafolios</h2>
             <div>
                 <button class="btn btn-primary" onclick="add_portfolio_modal.showModal()">Agregar</button>
                 <button class="btn btn-secondary" onclick="">Subir excel</button>
-                <a class="btn btn-tertiary" href="{% url 'client-list' %}">Volver</a>
             </div>
         </div>
         <div class="overflow-x-auto">
-            <div id="tabla-portafolio"
-                 hx-get="{% url 'portfolio-list' contract.id %}" 
+            <div id="tabla-portafolio-general"
+                 hx-get="{% url 'portfolio-list-general' %}" 
                  hx-trigger="load, portfolioCreated from:body, reload-table from:body"
-                 hx-target="#tabla-portafolio" 
+                 hx-target="#tabla-portafolio-general" 
                  hx-swap="innerHTML">
                 Cargando portafolio...
             </div>
@@ -27,6 +26,4 @@
     </div>
 </div>
 
-{% include "portfolio/create_modal.html" with contract=contract %}
-{% include "portfolio/edit_modal.html"%}
 {% endblock %}

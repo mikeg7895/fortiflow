@@ -18,6 +18,7 @@
         <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a></li>
         <li><a href="{% url 'user-list' %}" class="{% if request.resolver_match.url_name == 'users' %}active{% endif %}">Usuarios</a></li>
         <li><a href="{% url 'client-list' %}" class="{% if request.resolver_match.url_name == 'clients' %}active{% endif %}">Clientes</a></li>
+        <li><a href="{% url 'portfolio-list-general' %}" class="{% if request.resolver_match.url_name == 'portfolio-list-general' %}active{% endif %}">Portafolios</a></li>
         <li><a>Programas</a></li>
         <li><a>Notificaciones</a></li>
         </ul>
