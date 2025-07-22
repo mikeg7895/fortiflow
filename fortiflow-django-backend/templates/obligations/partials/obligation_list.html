@@ -1,0 +1,62 @@
+{% load pagination_tags %}
+<table class="table w-full" id="tabla-obligaciones">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Deudor</th>
+            <th>Tipo</th>
+            <th>Crédito</th>
+            <th>Monto</th>
+            <th>Fecha desembolso</th>
+            <th>Fecha vencimiento</th>
+            <th>Días mora</th>
+            <th>Estado</th>
+            <th>Saldo</th>
+            <th>Interés</th>
+            <th>Cuota</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for obligation in obligations %}
+        <tr>
+            <td>{{ obligation.id }}</td>
+            <td>{{ obligation.debtor.name }}</td>
+            <td>{{ obligation.get_portfolio_type_display }}</td>
+            <td>{{ obligation.credit }}</td>
+            <td>{{ obligation.amount }}</td>
+            <td>{{ obligation.date_amount }}</td>
+            <td>{{ obligation.expiration_date }}</td>
+            <td>{{ obligation.days_delinquency }}</td>
+            <td>{{ obligation.status }}</td>
+            <td>{{ obligation.balance }}</td>
+            <td>{{ obligation.interest }}</td>
+            <td>{{ obligation.fee }}</td>
+            <td>
+                <button class="btn btn-primary btn-xs"
+                    hx-get="{% url 'obligation-edit' obligation.id %}"
+                    hx-target="#modal-obligation-edit-form-content"
+                    hx-trigger="click"
+                    hx-swap="innerHTML"
+                    onclick="edit_obligation_modal.showModal()">
+                    Editar
+                </button>
+                <button 
+                    hx-delete="{% url 'obligation-delete' obligation.id %}"
+                    hx-trigger="click"
+                    hx-target="closest tr"
+                    hx-swap="outerHTML"
+                    class="btn btn-error btn-xs">
+                    Eliminar
+                </button>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="13">No hay obligaciones</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if is_paginated %}
+    {% smart_pagination page_obj "#tabla-obligaciones" %}
+{% endif %}
+

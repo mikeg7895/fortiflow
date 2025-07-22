@@ -6,7 +6,7 @@
         
         <div 
             id="modal-form-content" 
-            hx-get="{% url 'portfolio-create' contract.id %}" 
+            hx-get="{% url 'portfolio-create' contract.id|default:0 %}"
             hx-trigger="load" 
             hx-target="#modal-form-content" 
             hx-swap="innerHTML"

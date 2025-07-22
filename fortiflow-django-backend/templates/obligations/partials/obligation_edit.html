@@ -1,0 +1,171 @@
+<h3 class="text-lg font-bold mb-4">Editar Obligación</h3>
+<form method="post" action="{% url 'obligation-edit' object.id %}" hx-post="{% url 'obligation-edit' object.id %}" hx-target="#modal-obligation-edit-form-content" hx-swap="innerHTML" class="space-y-4 mt-5">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-error shadow-lg mb-4">
+        <div>
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.debtor.id_for_label }}">
+                <span class="label-text">{{ form.debtor.label }}</span>
+            </label>
+            {{ form.debtor }}
+            {% if form.debtor.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.debtor.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="{{ form.portfolio_type.id_for_label }}">
+                <span class="label-text">{{ form.portfolio_type.label }}</span>
+            </label>
+            {{ form.portfolio_type }}
+            {% if form.portfolio_type.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.portfolio_type.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.credit.id_for_label }}">
+                <span class="label-text">{{ form.credit.label }}</span>
+            </label>
+            {{ form.credit }}
+            {% if form.credit.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.credit.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="{{ form.amount.id_for_label }}">
+                <span class="label-text">{{ form.amount.label }}</span>
+            </label>
+            {{ form.amount }}
+            {% if form.amount.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.amount.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.date_amount.id_for_label }}">
+                <span class="label-text">{{ form.date_amount.label }}</span>
+            </label>
+            <input type="date" name="date_amount" class="input input-bordered w-full" id="{{ form.date_amount.id_for_label }}" value="{{ form.date_amount.value|default:object.date_amount|date:'Y-m-d' }}">
+            {% if form.date_amount.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.date_amount.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="{{ form.expiration_date.id_for_label }}">
+                <span class="label-text">{{ form.expiration_date.label }}</span>
+            </label>
+            <input type="date" name="expiration_date" class="input input-bordered w-full" id="{{ form.expiration_date.id_for_label }}" value="{{ form.expiration_date.value|default:object.expiration_date|date:'Y-m-d' }}">
+            {% if form.expiration_date.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.expiration_date.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.days_delinquency.id_for_label }}">
+                <span class="label-text">{{ form.days_delinquency.label }}</span>
+            </label>
+            {{ form.days_delinquency }}
+            {% if form.days_delinquency.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.days_delinquency.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="{{ form.status.id_for_label }}">
+                <span class="label-text">{{ form.status.label }}</span>
+            </label>
+            {{ form.status }}
+            {% if form.status.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.status.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.balance.id_for_label }}">
+                <span class="label-text">{{ form.balance.label }}</span>
+            </label>
+            {{ form.balance }}
+            {% if form.balance.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.balance.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="{{ form.interest.id_for_label }}">
+                <span class="label-text">{{ form.interest.label }}</span>
+            </label>
+            {{ form.interest }}
+            {% if form.interest.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.interest.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+    </div>
+    <div class="form-control">
+        <label class="label" for="{{ form.fee.id_for_label }}">
+            <span class="label-text">{{ form.fee.label }}</span>
+        </label>
+        {{ form.fee }}
+        {% if form.fee.errors %}
+            <label class="label">
+                <span class="label-text-alt text-error">{{ form.fee.errors.0 }}</span>
+            </label>
+        {% endif %}
+    </div>
+    <div class="modal-action">
+        <button type="button" class="btn btn-ghost" onclick="edit_obligation_modal.close()">
+            Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <span class="loading loading-spinner loading-sm hidden" id="submit-spinner-edit"></span>
+            Guardar Cambios
+        </button>
+    </div>
+</form>
+<script>
+    document.querySelector('form').addEventListener('htmx:beforeRequest', function() {
+        document.getElementById('submit-spinner-edit').classList.remove('hidden');
+    });
+    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+        const status = evt.detail.xhr.status;
+        if (status === 204) {
+            edit_obligation_modal.close();
+            Swal.fire(
+                'Obligación actualizada',
+                'La obligación ha sido actualizada exitosamente.',
+                'success'
+            );
+            htmx.trigger('body', 'reload-table');
+        }
+        document.getElementById('submit-spinner-edit').classList.add('hidden');
+    });
+</script>

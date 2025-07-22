@@ -1,0 +1,40 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Obligaciones{% endblock %}
+
+{% block title-header %}Obligaciones{% endblock %}
+
+{% block content %}
+<div class="card card-border bg-base-100">  
+    <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title">
+                Obligaciones del portafolio {{ portfolio.name }} del cliente {{ portfolio.contract.client.name }}
+            </h2>
+            <div>
+                <button class="btn btn-primary"
+                    hx-get="{% url 'obligation-create' portfolio_id %}"
+                    hx-target="#modal-obligation-form-content"
+                    hx-swap="innerHTML"
+                    hx-trigger="click"
+                    onclick="add_obligation_modal.showModal()">
+                    Agregar
+                </button>
+                <a class="btn btn-tertiary" href="{% url 'portfolio-list' portfolio_id %}">Volver</a>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <div id="tabla-obligaciones"
+                 hx-get="{% url 'obligation-list' portfolio_id %}"
+                 hx-trigger="load, obligationCreated from:body, reload-table from:body"
+                 hx-target="#tabla-obligaciones"
+                 hx-swap="innerHTML">
+                {% include 'obligations/partials/obligation_list.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'obligations/create_modal.html' with portfolio_id=portfolio_id %}
+{% include 'obligations/edit_modal.html' %}
+{% endblock %}
