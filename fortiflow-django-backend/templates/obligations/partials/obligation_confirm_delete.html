@@ -1,0 +1,10 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Eliminar Obligación{% endblock %}
+{% block content %}
+<h2 class="text-lg font-bold mb-4">¿Estás seguro que deseas eliminar esta obligación?</h2>
+<form method="post">
+    {% csrf_token %}
+    <button class="btn btn-error" type="submit">Eliminar</button>
+    <a class="btn btn-secondary" href="{% url 'obligation-list' object.portfolio_id %}">Cancelar</a>
+</form>
+{% endblock %}

@@ -1,0 +1,99 @@
+<h3 class="text-lg font-bold mb-4">Crear Deudor</h3>
+<form method="post" hx-post="{% url 'debtor-create' %}" hx-target="#modal-form-content" class="space-y-4 mt-5">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-error shadow-lg mb-4">
+        <div>
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.name.id_for_label }}">
+                <span class="label-text">{{ form.name.label }}</span>
+            </label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.name.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="{{ form.identification.id_for_label }}">
+                <span class="label-text">{{ form.identification.label }}</span>
+            </label>
+            {{ form.identification }}
+            {% if form.identification.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.identification.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.number_phone.id_for_label }}">
+                <span class="label-text">{{ form.number_phone.label }}</span>
+            </label>
+            {{ form.number_phone }}
+            {% if form.number_phone.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.number_phone.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="{{ form.address.id_for_label }}">
+                <span class="label-text">{{ form.address.label }}</span>
+            </label>
+            {{ form.address }}
+            {% if form.address.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.address.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+    </div>
+    <div class="form-control">
+        <label class="label" for="{{ form.email.id_for_label }}">
+            <span class="label-text">{{ form.email.label }}</span>
+        </label>
+        {{ form.email }}
+        {% if form.email.errors %}
+            <label class="label">
+                <span class="label-text-alt text-error">{{ form.email.errors.0 }}</span>
+            </label>
+        {% endif %}
+    </div>
+    <div class="modal-action">
+        <button type="button" class="btn btn-ghost" onclick="add_debtor_modal.close()">
+            Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <span class="loading loading-spinner loading-sm" id="submit-spinner"></span>
+            Guardar Deudor
+        </button>
+    </div>
+</form>
+<script>
+    document.querySelector('form').addEventListener('htmx:beforeRequest', function() {
+        document.getElementById('submit-spinner').classList.remove('hidden');
+    });
+    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+        const status = evt.detail.xhr.status;
+        if (status === 204) {
+            add_debtor_modal.close();
+            Swal.fire(
+                'Deudor creado',
+                'El deudor ha sido creado exitosamente.',
+                'success'
+            );
+            htmx.trigger('body', 'reload-table');
+        }
+        document.getElementById('submit-spinner').classList.add('hidden');
+    });
+</script>
