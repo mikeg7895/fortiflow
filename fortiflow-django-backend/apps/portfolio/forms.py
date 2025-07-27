@@ -19,6 +19,18 @@ class ObligationForm(forms.ModelForm):
         # Solo mostrar deudores válidos (puedes personalizar el filtro si lo deseas)
         self.fields['debtor'].queryset = Debtor.objects.all()
 
+        # Add modern classes to all fields
+        for name, field in self.fields.items():
+            if isinstance(field.widget, forms.Select):
+                field.widget.attrs['class'] = 'select select-bordered w-full'
+            elif isinstance(field.widget, forms.Textarea):
+                field.widget.attrs['class'] = 'textarea textarea-bordered w-full'
+            elif isinstance(field.widget, forms.DateInput):
+                # Already set in widgets, skip
+                continue
+            else:
+                field.widget.attrs['class'] = 'input input-bordered w-full'
+
 
 class PortfolioForm(forms.ModelForm):
     name = forms.CharField(

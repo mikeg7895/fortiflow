@@ -1,0 +1,83 @@
+<h3 class="text-lg font-bold mb-4">Editar Gestión</h3>
+<form id="management-edit-form" method="post" hx-post="{% url 'management-edit' object.id %}" hx-target="#modal-edit-management-form-content" hx-swap="outerHTML" class="mt-5">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-error shadow-lg mb-4">
+        <div>
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-7xl mx-auto">
+        <div class="form-control">
+            <label class="label" for="id_action"><span class="label-text">Acción</span></label>
+            {{ form.action }}
+            {% if form.action.errors %}<span class="label-text-alt text-error">{{ form.action.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="id_type_contact"><span class="label-text">Tipo de contacto</span></label>
+            {{ form.type_contact }}
+            {% if form.type_contact.errors %}<span class="label-text-alt text-error">{{ form.type_contact.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="id_effect"><span class="label-text">Efecto</span></label>
+            {{ form.effect }}
+            {% if form.effect.errors %}<span class="label-text-alt text-error">{{ form.effect.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="id_contact"><span class="label-text">Contacto</span></label>
+            {{ form.contact }}
+            {% if form.contact.errors %}<span class="label-text-alt text-error">{{ form.contact.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="id_phone"><span class="label-text">Teléfono</span></label>
+            {{ form.phone }}
+            {% if form.phone.errors %}<span class="label-text-alt text-error">{{ form.phone.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="id_date_enagement"><span class="label-text">Fecha gestión</span></label>
+            <input type="date" name="date_enagement" id="id_date_enagement" class="input input-bordered w-full" value="{{ form.date_enagement.value|date:'Y-m-d'|default_if_none:'' }}">
+            {% if form.date_enagement.errors %}<span class="label-text-alt text-error">{{ form.date_enagement.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="id_commitment"><span class="label-text">Compromiso</span></label>
+            {{ form.commitment }}
+            {% if form.commitment.errors %}<span class="label-text-alt text-error">{{ form.commitment.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="id_next_management"><span class="label-text">Próxima gestión</span></label>
+            <input type="date" name="next_management" id="id_next_management" class="input input-bordered w-full" value="{{ form.next_management.value|date:'Y-m-d'|default_if_none:'' }}">
+            {% if form.next_management.errors %}<span class="label-text-alt text-error">{{ form.next_management.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-control xl:col-span-2">
+            <label class="label" for="id_observation"><span class="label-text">Observación</span></label>
+            {{ form.observation }}
+            {% if form.observation.errors %}<span class="label-text-alt text-error">{{ form.observation.errors.0 }}</span>{% endif %}
+        </div>
+    </div>
+    <div class="modal-action flex justify-center gap-2">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn" onclick="edit_management_modal.close()">Cancelar</button>
+    </div>
+</form>
+<script>
+document.getElementById('management-edit-form').addEventListener('htmx:beforeRequest', function () {
+    document.getElementById('submit-spinner')?.classList.remove('hidden');
+});
+
+document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+    const status = evt.detail.xhr.status;
+    if (status === 204) {
+        document.getElementById('edit_management_modal')?.close();
+        Swal.fire(
+            'Gestión actualizada',
+            'La gestión ha sido actualizada exitosamente.',
+            'success'
+        );
+        htmx.trigger('body', 'reload-table');
+    }
+    document.getElementById('submit-spinner')?.classList.add('hidden');
+});
+</script>

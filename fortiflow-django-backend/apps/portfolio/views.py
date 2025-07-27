@@ -15,6 +15,11 @@ from apps.client.models import Client
 from apps.portfolio.models import Portfolio, Debtor
 from apps.portfolio.forms import PortfolioForm, DebtorForm
 from apps.portfolio.models import Portfolio
+from django.views.decorators.http import require_GET
+from django.utils.decorators import method_decorator
+from django.template.loader import render_to_string
+
+
 class ObligationListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
     model = Obligation
     context_object_name = "obligations"
@@ -208,14 +213,8 @@ class PortfolioCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-# Vista auxiliar para contratos por cliente (HTMX)
-from django.views.decorators.http import require_GET
-from django.utils.decorators import method_decorator
-from django.template.loader import render_to_string
-from django.views import View as DjangoView
-
 @method_decorator(require_GET, name='dispatch')
-class ContractListByClientView(LoginRequiredMixin, DjangoView):
+class ContractListByClientView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         client_id = request.GET.get('client_id')
         contracts = Contract.objects.filter(client_id=client_id)
@@ -282,12 +281,24 @@ class DebtorListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
         if portfolio_id:
             queryset = queryset.filter(obligations__portfolio_id=portfolio_id).distinct()
 
+        nombre = self.request.GET.get('nombre', '').strip()
+        cedula = self.request.GET.get('cedula', '').strip()
+        if nombre:
+            queryset = queryset.filter(name__icontains=nombre)
+        if cedula:
+            queryset = queryset.filter(identification__icontains=cedula)
+
         return queryset.order_by('name')
 
     def get_template_names(self):
         if self.request.headers.get("HX-Request"):
             return ["debtors/partials/debtor_list.html"]
         return ["debtors/show_general.html"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['request'] = self.request
+        return context
     
 class DebtorCreateView(LoginRequiredMixin, CreateView):
     model = Debtor
