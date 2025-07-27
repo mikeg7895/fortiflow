@@ -26,5 +26,6 @@ urlpatterns = [
     path("dashboard/", include('apps.dashboard.urls')),   
     path("clients/", include('apps.client.urls')),
     path("portfolio/", include('apps.portfolio.urls')),
+    path("management/", include('apps.management.urls')),
     path("", RedirectView.as_view(url='/dashboard/')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

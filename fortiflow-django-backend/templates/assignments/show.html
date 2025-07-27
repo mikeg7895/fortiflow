@@ -1,0 +1,36 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Asignaciones{% endblock %}
+
+{% block title-header %}Asignaciones{% endblock %}
+
+{% block content %}
+<div class="card card-border bg-base-100">  
+    <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title">Listado de Asignaciones del Programa: {{ program.title }}</h2>
+            <div>
+                <button class="btn btn-primary"
+                    hx-get="{% url 'assignment-create-program' program.id %}"
+                    hx-target="#modal-assignment-form-content"
+                    hx-swap="innerHTML"
+                    hx-trigger="click"
+                    onclick="add_assignment_modal.showModal()">
+                    Agregar
+                </button>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <div id="tabla-assignments"
+                 hx-get="{% url 'assignment-list-program' program.id %}"
+                 hx-trigger="load, assignmentCreated from:body, assignmentUpdated from:body, assignmentDeleted from:body, reload-table from:body"
+                 hx-target="#tabla-assignments"
+                 hx-swap="innerHTML">
+                {% include 'assignments/partials/assignment_list.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% include "assignments/create_modal.html" %}
+{% include "assignments/edit_modal.html" %}
+{% endblock %}
