@@ -5,19 +5,21 @@
 {% block title-header %}Usuarios{% endblock %}
 
 {% block content %}
-<div class="card card-border bg-base-100">  
+<div class="">  
     <div class="card-body">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="card-title">Usuarios</h2>
+            <h1 class="card-title title-main">Usuarios</h1>
             <button class="btn btn-primary" onclick="add_user_modal.showModal()">Agregar</button>
         </div>
-        <div class="overflow-x-auto">
+        <div class="table-container">
             <div id="tabla-usuarios"
                  hx-get="{% url 'user-list' %}" 
                  hx-trigger="load, userCreated from:body, reload-table from:body"
                  hx-target="#tabla-usuarios" 
                  hx-swap="innerHTML">
-                Cargando usuarios...
+                 <div style="width: 100%; text-align: center; padding: 10px 5px; box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+                     Cargando usuarios...
+                 </div>
             </div>
         </div>
     </div>

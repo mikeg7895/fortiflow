@@ -1,6 +1,6 @@
 {% load pagination_tags %}
 
-<table class="table">
+<table class="custom-table">
     <thead>
         <tr>
             <th></th>
@@ -15,7 +15,7 @@
     <tbody>
         {% for user in users %}
             <tr>
-                <th>{{ user.id }}</th>
+                <td>{{ user.id }}</td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.first_name }}</td>
                 <td>{{ user.last_name }}</td>
@@ -25,14 +25,28 @@
                         <span class="badge">{{ g.name }}</span>
                     {% endfor %}
                 </td>
-                <td>
-                    <button class="btn btn-primary btn-xs" hx-get="{% url 'user-edit' user.id %}" hx-target="#modal-edit-form-content" hx-trigger="click" onclick="edit_user_modal.showModal()">Editar</button>
-                    <button class="btn btn-error btn-xs" onclick="confirmDeleteUser({{ user.id }})">Eliminar</button>
+                <td class="relative">
+                    <div class="relative inline-block text-left group">
+                        <!-- Botón de los 3 puntos -->
+                        <button type="button" class="peer p-2" style="cursor: pointer;">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div class="absolute z-10 hidden group-focus-within:block dropdown-main">
+                            <li>
+                                <button style="cursor: pointer;" hx-get="{% url 'user-edit' user.id %}" hx-target="#modal-edit-form-content" hx-trigger="click" onclick="edit_user_modal.showModal()">Editar</button>
+                            </li>
+                            <li>
+                                <button style="cursor: pointer;" onclick="confirmDeleteUser({{ user.id }})">Eliminar</button>
+                            </li>
+                        </div>
+                    </div>
                 </td>
             </tr>
         {% empty %}
             <tr>
-                <td colspan="4">No hay usuarios</td>
+                <td colspan="12" style="text-align: center;">No hay usuarios</td>
             </tr>
         {% endfor %}
     </tbody>

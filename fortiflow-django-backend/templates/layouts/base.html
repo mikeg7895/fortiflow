@@ -1,102 +1,157 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>{% block title %}{% endblock %} | FortiFlow</title>
-    {% load static %}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-</head>
-<body class="flex h-screen">
+  <head>
+      <title>{% block title %}{% endblock %} | FORTIFLOW</title>
+      {% load static %}
+      <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+      <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+      <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+      <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+      <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  </head>
+  <body class="flex h-screen bg-gray-100">
     <!-- Sidebar -->
-    <aside class="w-64 bg-base-200 p-4">
-        <div class="text-2xl font-bold mb-4">FortiFlow</div>
-        <ul class="menu">
-        <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a></li>
-        <li><a href="{% url 'user-list' %}" class="{% if request.resolver_match.url_name == 'users' %}active{% endif %}">Usuarios</a></li>
-        <li><a href="{% url 'client-list' %}" class="{% if request.resolver_match.url_name == 'clients' %}active{% endif %}">Clientes</a></li>
-        <li><a href="{% url 'portfolio-list-general' %}" class="{% if request.resolver_match.url_name == 'portfolio-list-general' %}active{% endif %}">Portafolios</a></li>
-        <li><a>Programas</a></li>
-        <li><a>Notificaciones</a></li>
+    <aside class="w-64 bg-[#014d4f] text-white p-4 flex flex-col rounded-tr-[2rem] rounded-br-[2rem]">
+      <!-- Logo -->
+      <div class="text-2xl italic font-bold mb-8 pl-2">Fortiflow</div>
+
+      <!-- Menú -->
+      <nav class="flex-1">
+        <ul class="space-y-4">
+          <li>
+            <a href="{% url 'dashboard' %}"
+              class="nav-link flex items-center px-4 py-2 text-white {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+              <span class="mr-3">
+                <i class="fas fa-th-large"></i>
+              </span>
+              <div class="square"></div>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'user-list' %}"
+              class="nav-link flex items-center px-4 py-2 text-white {% if request.resolver_match.url_name == 'user-list' %}active{% endif %}">
+              <span class="mr-3">
+                <i class="fas fa-user"></i>
+              </span>
+              <div class="square"></div>
+              Usuarios
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'client-list' %}" class="nav-link flex items-center px-4 py-2 text-white {% if request.resolver_match.url_name == 'client-list' %}active{% endif %}">
+              <span class="mr-3">
+                <i class="fas fa-users"></i>
+              </span>
+              <div class="square"></div>
+              Clientes
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'portfolio-list-general' %}" class="nav-link flex items-center px-4 py-2 text-white {% if request.resolver_match.url_name == 'portfolio-list-general' %}active{% endif %}">
+              <span class="mr-3">
+                <i class="fas fa-folder"></i>
+              </span>
+              <div class="square"></div>
+              Portafolios
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link flex items-center px-4 py-2 text-white">
+              <span class="mr-3">
+                <i class="fas fa-window-restore"></i>
+              </span>
+              <div class="square"></div>
+              Programas
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link flex items-center px-4 py-2 text-white">
+              <span class="mr-3">
+                <i class="fas fa-bell"></i>
+              </span>
+              <div class="square"></div>
+              Notificaciones
+            </a>
+          </li>
         </ul>
+      </nav>
     </aside>
 
-    <main class="flex-1 p-6 bg-base-100 overflow-y-auto">
-        <div class="navbar bg-base-100 shadow-sm mb-4">
-            <div class="flex-1">
-              <!-- <a class="btn btn-ghost text-xl">FortiFlow</a>-->
-            </div>
-            <div class="flex gap-2">
-              <input type="text" placeholder="Buscar..." class="input input-bordered w-24 md:w-auto" />
-              <div class="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                  <div class="w-10 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v-1.5a3 3 0 00-3-3h-1.5a3 3 0 00-3 3v1.5m3-6.75a3 3 0 100-6 3 3 0 000 6z" />
-                    </svg>                    
-                  </div>
+    <main class="flex-1 p-6 bg-gray-100 overflow-y-auto">
+      <div class="navbar">
+          <div class="flex-1">
+            <!-- <a class="btn btn-ghost text-xl">FortiFlow</a>-->
+          </div>
+          <div class="flex gap-2">
+            <input type="text" placeholder="Buscar" class="input input-bordered w-80" />
+            <div class="dropdown dropdown-end">
+              <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                <div class="w-10 rounded-full avatar-nav">
+                  <i class="fa-regular fa-circle-user"></i>              
                 </div>
-                <ul
-                  tabindex="0"
-                  class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                  <li>
-                    <a class="justify-between">
-                      Perfil
-                    </a>
-                  </li>
-                  <li><a>Configuración</a></li>
-                  <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
-                    {% csrf_token %}
-                  </form>
-                  <li><button onclick="confirmLogout()">Salir</button></li>
-                </ul>
               </div>
+              <ul
+                tabindex="0"
+                class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+                <li>
+                  <a class="justify-between">
+                    Perfil
+                  </a>
+                </li>
+                <li><a>Configuración</a></li>
+                <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+                  {% csrf_token %}
+                </form>
+                <li><button onclick="confirmLogout()">Salir</button></li>
+              </ul>
             </div>
-        </div>
-        {% block content %}{% endblock %}
+          </div>
+      </div>
+      <hr style="margin: .6rem 0 2rem 0; color: #dedede;">
+      {% block content %}{% endblock %}
     </main>
     {% block scripts %}{% endblock %}
     <script>
       function getCookie(name) {
-          let cookieValue = null;
-          if (document.cookie && document.cookie !== '') {
-              const cookies = document.cookie.split(';');
-              for (let i = 0; i < cookies.length; i++) {
-                  const cookie = cookies[i].trim();
-                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                      break;
-                  }
-              }
-          }
-          return cookieValue;
-      }
-  
-      const csrfToken = getCookie('csrftoken');
-  
-      document.body.addEventListener('htmx:configRequest', (event) => {
-          event.detail.headers['X-CSRFToken'] = csrfToken;
-      });
-
-      function confirmLogout() {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: 'Esta acción cerrará tu sesión.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, cerrar sesión',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-              document.getElementById('logout-form').submit();
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
             }
+            return cookieValue;
+        }
+    
+        const csrfToken = getCookie('csrftoken');
+    
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = csrfToken;
         });
-    }
-  </script>
-</body>
+
+        function confirmLogout() {
+          Swal.fire({
+              title: '¿Estás seguro?',
+              text: 'Esta acción cerrará tu sesión.',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#3085d6',
+              confirmButtonText: 'Sí, cerrar sesión',
+              cancelButtonText: 'Cancelar'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                document.getElementById('logout-form').submit();
+              }
+          });
+      }
+    </script>
+  </body>
 </html>

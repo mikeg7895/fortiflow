@@ -5,22 +5,24 @@
 {% block title-header %}Portafolio{% endblock %}
 
 {% block content %}
-<div class="card card-border bg-base-100">  
+<div class="">  
     <div class="card-body">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="card-title">Portafolios</h2>
+            <h2 class="card-title title-main">Portafolios</h2>
             <div>
                 <button class="btn btn-primary" onclick="add_portfolio_modal.showModal()">Agregar</button>
                 <button class="btn btn-secondary" onclick="">Subir excel</button>
             </div>
         </div>
-        <div class="overflow-x-auto">
+        <div class="table-container">
             <div id="tabla-portafolio-general"
                  hx-get="{% url 'portfolio-list-general' %}" 
                  hx-trigger="load, portfolioCreated from:body, reload-table from:body"
                  hx-target="#tabla-portafolio-general" 
                  hx-swap="innerHTML">
-                Cargando portafolio...
+                <div style="width: 100%; text-align: center; padding: 10px 5px; box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+                     Cargando portafolio...
+                 </div>
             </div>
         </div>
     </div>
