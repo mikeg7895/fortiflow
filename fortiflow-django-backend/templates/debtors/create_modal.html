@@ -1,0 +1,11 @@
+<dialog id="add_debtor_modal" class="modal">
+    <div class="modal-box w-11/12 max-w-2xl">
+        <div id="modal-form-content"
+             hx-get="{% url 'debtor-create' %}"
+             hx-trigger="show"
+             hx-target="#modal-form-content"
+             hx-swap="innerHTML">
+            <!-- El formulario se carga aquí dinámicamente -->
+        </div>
+    </div>
+</dialog>

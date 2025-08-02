@@ -1,0 +1,60 @@
+{% load pagination_tags %}
+
+<h3 class="text-lg font-bold mb-4">Lista de Deudores</h3>
+<form method="get" hx-get="{% url 'debtor-list' %}" hx-target="#tabla-deudores" hx-swap="innerHTML" class="flex flex-wrap gap-4 mb-4">
+    <input type="text" name="nombre" value="{{ request.GET.nombre }}" placeholder="Buscar por nombre" class="input input-bordered w-full max-w-xs" />
+    <input type="text" name="cedula" value="{{ request.GET.cedula }}" placeholder="Buscar por cédula" class="input input-bordered w-full max-w-xs" />
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+<table class="table w-full" id="tabla-deudores">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Identificación</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
+            <th>Email</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for debtor in debtors %}
+        <tr>
+            <td>{{ debtor.name }}</td>
+            <td>{{ debtor.identification }}</td>
+            <td>{{ debtor.number_phone }}</td>
+            <td>{{ debtor.address }}</td>
+            <td>{{ debtor.email }}</td>
+            <td>
+                <button 
+                    class="btn btn-xs btn-warning"
+                    hx-get="{% url 'debtor-edit' debtor.pk %}"
+                    hx-target="#modal-edit-form-content"
+                    hx-swap="innerHTML"
+                    onclick="edit_debtor_modal.showModal()"
+                >Editar</button>
+                <button hx-delete="{% url 'debtor-delete' debtor.pk %}" hx-trigger="click" hx-target="closest tr" hx-swap="outerHTML" class="btn btn-xs btn-error">Eliminar</button>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No hay deudores registrados.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if is_paginated %}
+    {% smart_pagination page_obj "#tabla-deudores" %}
+{% endif %}
+<script>
+    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+        const status = evt.detail.xhr.status;
+        const verb = evt.detail.requestConfig && evt.detail.requestConfig.verb;
+        const path = evt.detail.requestConfig && evt.detail.requestConfig.path;
+        if (verb === 'DELETE' && path && path.includes('/debtors/delete/') && status === 204) {
+            Swal.fire(
+                'Deudor eliminado',
+                'El deudor ha sido eliminado exitosamente.',
+                'success'
+            );
+        }
+    });
+</script>

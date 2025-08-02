@@ -76,6 +76,18 @@
               Notificaciones
             </a>
           </li>
+    <aside class="w-64 bg-base-200 p-4">
+        <div class="text-2xl font-bold mb-4">FortiFlow</div>
+
+        <ul class="menu">
+            <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+            <li><a href="{% url 'user-list' %}" class="{% if request.resolver_match.url_name == 'users' %}active{% endif %}">Usuarios</a></li>
+            <li><a href="{% url 'client-list' %}" class="{% if request.resolver_match.url_name == 'clients' %}active{% endif %}">Clientes</a></li>
+            <li><a href="{% url 'portfolio-list-general' %}" class="{% if request.resolver_match.url_name == 'portfolio-list-general' %}active{% endif %}">Portafolios</a></li>
+            <li><a href="{% url 'program-list' %}" class="{% if request.resolver_match.url_name == 'program-list' %}active{% endif %}">Programas</a></li>
+            <li><a href="{% url 'assignment-list' %}" class="{% if request.resolver_match.url_name == 'assignment-list' %}active{% endif %}">Asignaciones</a></li>
+            <li><a href="{% url 'debtor-list' %}" class="{% if request.resolver_match.url_name == 'debtor-list' %}active{% endif %}">Deudores</a></li>
+            <li><a>Notificaciones</a></li>
         </ul>
       </nav>
     </aside>

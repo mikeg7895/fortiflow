@@ -1,0 +1,37 @@
+<dialog id="delete_program_modal" class="modal">
+    <div class="modal-box w-11/12 max-w-md">
+        <h3 class="font-bold text-lg mb-4">¿Eliminar programa?</h3>
+        <p class="mb-6">¿Estás seguro que deseas eliminar este programa?</p>
+        <form id="delete-program-form" method="post" class="space-y-4">
+            {% csrf_token %}
+            <div class="modal-action">
+                <button type="button" class="btn" onclick="delete_program_modal.close()">Cancelar</button>
+                <button type="submit" class="btn btn-error">Eliminar</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+<script>
+    let programToDeleteId = null;
+    function openDeleteProgramModal(programId) {
+        programToDeleteId = programId;
+        delete_program_modal.showModal();
+    }
+    document.getElementById('delete-program-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        fetch(`/management/programs/${programToDeleteId}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'HX-Request': 'true',
+                'X-CSRFToken': document.querySelector('#delete-program-form [name=csrfmiddlewaretoken]').value
+            }
+        }).then(response => {
+            if (response.status === 204) {
+                delete_program_modal.close();
+                Swal.fire('Eliminado', 'El programa ha sido eliminado.', 'success');
+                htmx.trigger('#tabla-programs', 'reload-table');
+            }
+        });
+    });
+</script>

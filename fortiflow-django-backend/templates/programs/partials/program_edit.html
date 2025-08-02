@@ -1,0 +1,47 @@
+</form>
+<script>
+    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+        const status = evt.detail.xhr.status;
+        if (status === 204) {
+            edit_program_modal.close();
+            Swal.fire(
+                'Programa editado',
+                'El programa ha sido editado exitosamente.',
+                'success'
+            );
+            htmx.trigger('#tabla-programs', 'reload-table');
+        }
+    });
+</script>
+{% load static %}
+<form method="post" hx-post="{% url 'program-edit' form.instance.id %}" hx-target="#tabla-programs" hx-swap="innerHTML" class="space-y-4">
+    {% csrf_token %}
+    <div class="form-control">
+        <label class="label">Título</label>
+        {{ form.title }}
+    </div>
+    <div class="form-control">
+        <label class="label">Descripción</label>
+        {{ form.description }}
+    </div>
+    <div class="form-control">
+        <label class="label">Supervisor</label>
+        {{ form.supervisor }}
+    </div>
+    <div class="form-control">
+        <label class="label">¿Llamadas iniciadas?</label>
+        {{ form.calls_initiated }}
+    </div>
+    <div class="form-control">
+        <label class="label">¿Finalizado?</label>
+        {{ form.is_finished }}
+    </div>
+    <div class="form-control">
+        <label class="label">¿Pausado?</label>
+        {{ form.is_paused }}
+    </div>
+    <div class="modal-action">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn" onclick="add_program_modal.close()">Cancelar</button>
+    </div>
+</form>

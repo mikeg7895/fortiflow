@@ -24,7 +24,7 @@
                 <td>{{ portfolio.delinquency_percentage }}%</td>
                 <td>{{ portfolio.status }}</td>
                 <td>
-                    <a class="btn btn-primary btn-xs" href="#">Ver</a>
+                    <a class="btn btn-primary btn-xs" href="/portfolio/{{ portfolio.id }}/obligations/">Ver</a>
                     <button class="btn btn-primary btn-xs" hx-get="{% url 'portfolio-edit' portfolio.id contract.id %}" hx-target="#modal-edit-form-content" hx-trigger="click" onclick="edit_portfolio_modal.showModal()">Editar</button>
                     <button class="btn btn-error btn-xs" onclick="confirmDeletePortfolio({{ portfolio.id }})">Eliminar</button>
                 </td>
@@ -37,7 +37,7 @@
     </tbody>
 </table>
 {% if is_paginated %}
-    {% smart_pagination page_obj "#tabla-clientes" %}
+    {% smart_pagination page_obj "#tabla-portafolios" %}
 {% endif %}
 
 <script>
