@@ -5,22 +5,20 @@
 {% block title-header %}Asignaciones{% endblock %}
 
 {% block content %}
-<div class="card card-border bg-base-100">  
+<div class="">  
     <div class="card-body">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="card-title">Listado de Asignaciones</h2>
-            <div>
-                <button class="btn btn-primary"
-                    hx-get="{% url 'assignment-create' %}"
-                    hx-target="#modal-assignment-form-content"
-                    hx-swap="innerHTML"
-                    hx-trigger="click"
-                    onclick="add_assignment_modal.showModal()">
-                    Agregar
-                </button>
-            </div>
+            <h2 class="card-title title-main">Listado de Asignaciones</h2>
+            <button class="btn btn-primary"
+                hx-get="{% url 'assignment-create' %}"
+                hx-target="#modal-assignment-form-content"
+                hx-swap="innerHTML"
+                hx-trigger="click"
+                onclick="add_assignment_modal.showModal()">
+                Agregar
+            </button>
         </div>
-        <div class="overflow-x-auto">
+        <div class="table-container">
             <div id="tabla-assignments-general"
                  hx-get="{% url 'assignment-list' %}"
                  hx-trigger="load, assignmentCreated from:body, assignmentUpdated from:body, assignmentDeleted from:body, reload-table from:body"

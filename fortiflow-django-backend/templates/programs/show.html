@@ -5,22 +5,20 @@
 {% block title-header %}Programas{% endblock %}
 
 {% block content %}
-<div class="card card-border bg-base-100">  
+<div class="">  
     <div class="card-body">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="card-title">Listado de Programas</h2>
-            <div>
-                <button class="btn btn-primary"
-                    hx-get="{% url 'program-create' %}"
-                    hx-target="#modal-program-form-content"
-                    hx-swap="innerHTML"
-                    hx-trigger="click"
-                    onclick="add_program_modal.showModal()">
-                    Agregar
-                </button>
-            </div>
+            <h1 class="card-title">Listado de Programas</h1>
+            <button class="btn btn-primary"
+                hx-get="{% url 'program-create' %}"
+                hx-target="#modal-program-form-content"
+                hx-swap="innerHTML"
+                hx-trigger="click"
+                onclick="add_program_modal.showModal()">
+                Agregar
+            </button>
         </div>
-        <div class="overflow-x-auto">
+        <div class="table-container">
             <div id="tabla-programs"
                  hx-get="{% url 'program-list' %}"
                  hx-trigger="load, programCreated from:body, programUpdated from:body, programDeleted from:body, reload-table from:body"

@@ -1,3 +1,12 @@
+* {
+    font-family: sans-serif;
+}
+@view-transition {
+    navigation: auto;
+}
+::view-transition-group(*){
+    animation-duration: 0.3s;
+}
 .nav-link {
     position: relative;
     z-index: 10;
@@ -43,12 +52,12 @@
 input {
     border: 0;
     border-radius: 10px;
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 2px 24px 1px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 6px 0px;
 }
 .input {
     &:focus, &:focus-within {
         --input-color: #ffffff00;
-        box-shadow: rgba(100, 100, 111, 0.2) 0px 2px 24px 1px;
+        box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 6px 0px;
  color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), #0000);
         outline: 2px solid var(--input-color);
         outline-offset: 0px;
@@ -59,12 +68,12 @@ input {
 select {
     border: 0;
     border-radius: 10px;
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 2px 24px 1px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 6px 0px;
 }
 .select {
     &:focus, &:focus-within {
         --input-color: #ffffff00;
-        box-shadow: rgba(100, 100, 111, 0.2) 0px 2px 24px 1px;
+        box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 6px 0px;
  color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), #0000);
         outline: 2px solid var(--input-color);
         outline-offset: 0px;
@@ -171,4 +180,62 @@ select {
 /* Botones */
 .btn {
     border-radius: 16px;
+}
+
+/* Grid Dashboard */
+.parent {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 0fr);
+    gap: 8px;
+    height: 100vh;
+}
+.div4 {
+    grid-row: span 2 / span 2;
+}
+.div5 {
+    grid-column: span 2 / span 2;
+}
+.div6 {
+    grid-column: span 2 / span 2;
+    grid-column-start: 2;
+    grid-row-start: 3;
+}
+
+/* Cards */
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #ffffff;
+    background-clip: border-box;
+    border-radius: 10px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 6px 0px;
+}
+.card-body {
+    flex: 1 1 auto;
+    padding: 1rem 1rem;
+}
+.card-da {
+    padding: .4rem;
+    color: #010101;
+}
+.card-da h1 {
+    font-size: 32px;
+    font-weight: bold;
+}
+.card-da .da-body {
+    padding-bottom: 2rem;
+}
+
+/* h */
+h4 {
+    font-size: 18px;
+    color: #6a6a6a;
+}
+h3 {
+    font-size: 24px;
+    color: #6a6a6a; 
 }

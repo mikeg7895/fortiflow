@@ -5,7 +5,7 @@
     <input type="text" name="deudor" value="{{ request.GET.deudor }}" placeholder="Buscar por deudor" class="input input-bordered w-full max-w-xs" />
     <button type="submit" class="btn btn-primary">Filtrar</button>
 </form>
-<table class="table w-full" id="tabla-assignments-general">
+<table class="custom-table" id="tabla-assignments-general">
     <thead>
         <tr>
             <th>ID</th>
@@ -31,7 +31,9 @@
             </td>
         </tr>
         {% empty %}
-        <tr><td colspan="6">No hay asignaciones registradas.</td></tr>
+            <tr>
+                <td colspan="12" style="text-align: center|;">No hay asignaciones registradas.</td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>

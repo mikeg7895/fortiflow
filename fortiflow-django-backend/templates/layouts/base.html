@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-      <title>{% block title %}{% endblock %} | FORTIFLOW</title>
+      <title>{% block title %}{% endblock %} | Fortiflow</title>
       {% load static %}
       <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
       <script src="https://unpkg.com/htmx.org@2.0.4"></script>
@@ -10,6 +10,7 @@
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
       <link rel="stylesheet" href="{% static 'css/style.css' %}">
+      <script src="https://code.highcharts.com/12/highcharts.js"> </script>
   </head>
   <body class="flex h-screen bg-gray-100">
     <!-- Sidebar -->
@@ -59,12 +60,30 @@
             </a>
           </li>
           <li>
-            <a href="#" class="nav-link flex items-center px-4 py-2 text-white">
+            <a href="{% url 'program-list' %}" class="nav-link flex items-center px-4 py-2 text-white {% if request.resolver_match.url_name == 'program-list' %}active{% endif %}">
               <span class="mr-3">
                 <i class="fas fa-window-restore"></i>
               </span>
               <div class="square"></div>
               Programas
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'assignment-list' %}" class="nav-link flex items-center px-4 py-2 text-white {% if request.resolver_match.url_name == 'assignment-list' %}active{% endif %}">
+              <span class="mr-3">
+                <i class="fas fa-window-restore"></i>
+              </span>
+              <div class="square"></div>
+              Asignaciones
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'debtor-list' %}" class="nav-link flex items-center px-4 py-2 text-white {% if request.resolver_match.url_name == 'debtor-list' %}active{% endif %}">
+              <span class="mr-3">
+                <i class="fas fa-window-restore"></i>
+              </span>
+              <div class="square"></div>
+              Deudores
             </a>
           </li>
           <li>
@@ -76,18 +95,6 @@
               Notificaciones
             </a>
           </li>
-    <aside class="w-64 bg-base-200 p-4">
-        <div class="text-2xl font-bold mb-4">FortiFlow</div>
-
-        <ul class="menu">
-            <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a></li>
-            <li><a href="{% url 'user-list' %}" class="{% if request.resolver_match.url_name == 'users' %}active{% endif %}">Usuarios</a></li>
-            <li><a href="{% url 'client-list' %}" class="{% if request.resolver_match.url_name == 'clients' %}active{% endif %}">Clientes</a></li>
-            <li><a href="{% url 'portfolio-list-general' %}" class="{% if request.resolver_match.url_name == 'portfolio-list-general' %}active{% endif %}">Portafolios</a></li>
-            <li><a href="{% url 'program-list' %}" class="{% if request.resolver_match.url_name == 'program-list' %}active{% endif %}">Programas</a></li>
-            <li><a href="{% url 'assignment-list' %}" class="{% if request.resolver_match.url_name == 'assignment-list' %}active{% endif %}">Asignaciones</a></li>
-            <li><a href="{% url 'debtor-list' %}" class="{% if request.resolver_match.url_name == 'debtor-list' %}active{% endif %}">Deudores</a></li>
-            <li><a>Notificaciones</a></li>
         </ul>
       </nav>
     </aside>
