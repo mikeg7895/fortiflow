@@ -1,0 +1,83 @@
+{% load pagination_tags %}
+<form method="get" hx-get="" hx-target="#tabla-managements" hx-swap="innerHTML" class="flex flex-wrap gap-4 mb-4">
+    <input type="text" name="accion" value="{{ request.GET.accion }}" placeholder="Buscar por acción" class="input input-bordered w-full max-w-xs" />
+    <input type="text" name="contacto" value="{{ request.GET.contacto }}" placeholder="Buscar por contacto" class="input input-bordered w-full max-w-xs" />
+    <input type="text" name="telefono" value="{{ request.GET.telefono }}" placeholder="Buscar por teléfono" class="input input-bordered w-full max-w-xs" />
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+<table class="table w-full" id="tabla-managements">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Acción</th>
+            <th>Tipo Contacto</th>
+            <th>Efecto</th>
+            <th>Contacto</th>
+            <th>Teléfono</th>
+            <th>Fecha Gestión</th>
+            <th>Compromiso</th>
+            <th>Observación</th>
+            <th>Próxima Gestión</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for m in managements %}
+        <tr>
+            <td>{{ m.id }}</td>
+            <td>{{ m.action }}</td>
+            <td>{{ m.type_contact }}</td>
+            <td>{{ m.effect }}</td>
+            <td>{{ m.contact }}</td>
+            <td>{{ m.phone }}</td>
+            <td>{{ m.date_enagement }}</td>
+            <td>{{ m.commitment }}</td>
+            <td>{{ m.observation }}</td>
+            <td>{{ m.next_management }}</td>
+            <td>
+                <button class="btn btn-xs btn-warning"
+                    hx-get="{% url 'management-edit' m.id %}"
+                    hx-target="#modal-edit-management-form-content" hx-swap="innerHTML" hx-trigger="click" onclick="edit_management_modal.showModal()">Editar</button>
+                <button class="btn btn-xs btn-error" onclick="confirmDeleteManagement('{{ m.id }}')">Eliminar</button>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="11">No hay gestiones registradas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if is_paginated %}
+    {% smart_pagination page_obj "#tabla-managements" %}
+{% endif %}
+
+<script>
+function confirmDeleteManagement(id) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Esta acción eliminará la gestión permanentemente.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/management/managements/delete/${id}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value
+                }
+            }).then(resp => {
+                if (resp.status === 204) {
+                    Swal.fire('¡Eliminado!', 'La gestión ha sido eliminada.', 'success');
+                    htmx.ajax('GET', window.location.pathname, {target: '#tabla-managements', swap: 'innerHTML'});
+                } else {
+                    Swal.fire('Error', 'No se pudo eliminar la gestión.', 'error');
+                }
+            });
+        }
+    });
+}
+</script>

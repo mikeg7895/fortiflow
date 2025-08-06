@@ -1,0 +1,50 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Deudores{% endblock %}
+
+{% block title-header %}Deudores{% endblock %}
+
+{% block content %}
+<div class="card card-border bg-base-100">  
+    <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title">Deudores {% if portfolio %}de {{ portfolio.name }}{% endif %}</h2>
+            <div>
+                <button class="btn btn-primary" onclick="add_debtor_modal.showModal()">Agregar</button>
+                <a class="btn btn-tertiary" href="{% url 'portfolio-list-general' %}">Volver</a>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <div id="tabla-deudores"
+                 hx-get="{% url 'debtor-list-portfolio' portfolio.id %}"
+                 hx-trigger="load, debtorCreated from:body, debtorUpdated from:body, debtorDeleted from:body, reload-table from:body"
+                 hx-target="#tabla-deudores"
+                 hx-swap="innerHTML">
+                Cargando deudores...
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear deudor -->
+<dialog id="add_debtor_modal" class="modal">
+    <div class="modal-box w-11/12 max-w-2xl">
+        <div id="modal-form-content"
+             hx-get="{% url 'debtor-create' %}"
+             hx-trigger="show"
+             hx-target="#modal-form-content"
+             hx-swap="innerHTML">
+            <!-- El formulario se carga aquí dinámicamente -->
+        </div>
+    </div>
+</dialog>
+
+<!-- Modal para editar deudor -->
+<dialog id="edit_debtor_modal" class="modal">
+    <div class="modal-box w-11/12 max-w-2xl">
+        <div id="modal-edit-form-content">
+            <!-- El formulario de edición se carga dinámicamente -->
+        </div>
+    </div>
+</dialog>
+{% endblock %}

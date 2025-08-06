@@ -1,5 +1,7 @@
 {% extends 'layouts/base.html' %}
 
+
+
 {% block title %}Portafolio{% endblock %}
 
 {% block title-header %}Portafolio{% endblock %}
@@ -25,5 +27,7 @@
         </div>
     </div>
 </div>
-
+{% include "portfolio/create_modal.html" %}
+{% include "portfolio/edit_modal.html" %}
+{% include "portfolio/delete_modal.html" %}
 {% endblock %}

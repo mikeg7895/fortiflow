@@ -1,5 +1,9 @@
 <h3 class="text-lg font-bold">Crear Portfolio</h3>
+{% if contract %}
 <form method="post" hx-post="{% url 'portfolio-create' contract.id %}" hx-target="#modal-form-content" class="space-y-4 mt-5" enctype="multipart/form-data">
+{% else %}
+<form method="post" hx-post="{% url 'portfolio-create' 0 %}" hx-target="#modal-form-content" class="space-y-4 mt-5" enctype="multipart/form-data">
+{% endif %}
     {% csrf_token %}
     
     {% if form.non_field_errors %}
@@ -13,6 +17,34 @@
                     <p>{{ error }}</p>
                 {% endfor %}
             </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not contract %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="client-select">
+                <span class="label-text">Cliente</span>
+            </label>
+            <select id="client-select" name="client_id" class="select select-bordered w-full" 
+                hx-get="{% url 'contracts-by-client' %}" 
+                hx-target="#contract-select" 
+                hx-trigger="change" 
+                hx-include="closest form">
+                <option value="">Seleccione un cliente</option>
+                {% for client in clients %}
+                    <option value="{{ client.id }}">{{ client.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-control">
+            <label class="label" for="contract-select">
+                <span class="label-text">Contrato</span>
+            </label>
+            <select id="contract-select" name="contract" class="select select-bordered w-full">
+                <option value="">Seleccione un contrato</option>
+            </select>
         </div>
     </div>
     {% endif %}

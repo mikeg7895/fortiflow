@@ -1,0 +1,82 @@
+<h3 class="text-lg font-bold mb-4">Crear Asignación</h3>
+<form id="assignment-create-form" method="post"
+    {% if program %}
+        hx-post="{% url 'assignment-create-program' program.id %}"
+    {% else %}
+        hx-post="{% url 'assignment-create' %}"
+    {% endif %}
+    hx-target="#modal-assignment-form-content" hx-swap="outerHTML" class="space-y-4 mt-5">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-error shadow-lg mb-4">
+        <div>
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+   
+        {% if form.program.field.widget.input_type != 'hidden' %}
+        <div class="form-control">
+            <label class="label" for="{{ form.program.id_for_label }}">
+                <span class="label-text">{{ form.program.label }}</span>
+            </label>
+            {{ form.program }}
+            {% if form.program.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.program.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+        {% endif %}
+        <div class="form-control">
+            <label class="label" for="{{ form.agent.id_for_label }}">
+                <span class="label-text">{{ form.agent.label }}</span>
+            </label>
+            {{ form.agent }}
+            {% if form.agent.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.agent.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="{{ form.debtor.id_for_label }}">
+                <span class="label-text">{{ form.debtor.label }}</span>
+            </label>
+            {{ form.debtor }}
+            {% if form.debtor.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ form.debtor.errors.0 }}</span>
+                </label>
+            {% endif %}
+        </div>
+    </div>
+    <div class="modal-action flex justify-center gap-2">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn" onclick="add_assignment_modal.close()">Cancelar</button>
+    </div>
+</form>
+<script>
+    document.querySelector('form').addEventListener('htmx:beforeRequest', function () {
+        document.getElementById('submit-spinner')?.classList.remove('hidden');
+    });
+
+    document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+        const status = evt.detail.xhr.status;
+        if (status === 204) {
+            if (typeof add_assignment_modal !== 'undefined') {
+                add_assignment_modal.close();
+            }
+            Swal.fire(
+                'Asignación creada',
+                'La asignación ha sido creada exitosamente.',
+                'success'
+            );
+            htmx.trigger('body', 'reload-table');
+        }
+        document.getElementById('submit-spinner')?.classList.add('hidden');
+    });
+</script>

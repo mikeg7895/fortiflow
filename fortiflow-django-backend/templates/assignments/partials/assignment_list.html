@@ -1,0 +1,78 @@
+{% load pagination_tags %}
+<form method="get" hx-get="" hx-target="#tabla-assignments" hx-swap="innerHTML" class="flex flex-wrap gap-4 mb-4">
+    {% if not program %}
+        <input type="text" name="programa" value="{{ request.GET.programa }}" placeholder="Buscar por programa" class="input input-bordered w-full max-w-xs" />
+    {% endif %}
+    <input type="text" name="agente" value="{{ request.GET.agente }}" placeholder="Buscar por agente" class="input input-bordered w-full max-w-xs" />
+    <input type="text" name="deudor" value="{{ request.GET.deudor }}" placeholder="Buscar por deudor" class="input input-bordered w-full max-w-xs" />
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+<table class="table w-full" id="tabla-assignments">
+    <thead>
+        <tr>
+            <th>ID</th>
+            {% if not program %}<th>Programa</th>{% endif %}
+            <th>Agente</th>
+            <th>Deudor</th>
+            <th>Fecha de asignación</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for assignment in assignments %}
+        <tr>
+            <td>{{ assignment.id }}</td>
+            {% if not program %}<td>{{ assignment.program.title }}</td>{% endif %}
+            <td>{{ assignment.agent.get_full_name|default:assignment.agent.username }}</td>
+            <td>{{ assignment.debtor.name }}</td>
+            <td>{{ assignment.created_at|date:'Y-m-d H:i' }}</td>
+            <td>
+                <button class="btn btn-xs btn-warning"
+                    hx-get="{% if program %}{% url 'assignment-edit-program' assignment.id program.id %}{% else %}{% url 'assignment-edit' assignment.id %}{% endif %}"
+                    hx-target="#modal-edit-assignment-form-content" hx-swap="innerHTML" hx-trigger="click" onclick="edit_assignment_modal.showModal()">Editar</button>
+                <a href="{% url 'management-list' assignment.id %}" class="btn btn-xs btn-info">Management</a>
+                <button class="btn btn-xs btn-error" onclick="openDeleteAssignmentModal('{{ assignment.id }}', false)">Eliminar</button>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="{% if not program %}6{% else %}5{% endif %}">No hay asignaciones registradas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if is_paginated %}
+    {% smart_pagination page_obj "#tabla-assignments" %}
+{% endif %}
+
+
+<script>
+function openDeleteAssignmentModal(id, isGeneral) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Esta acción no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/management/assignments/delete/${id}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            }).then(resp => {
+                if (resp.status === 204) {
+                    Swal.fire('¡Eliminado!', 'La asignación ha sido eliminada.', 'success');
+                    htmx.ajax('GET', window.location.pathname, {target: '#tabla-assignments', swap: 'innerHTML'});
+                } else {
+                    Swal.fire('Error', 'No se pudo eliminar la asignación.', 'error');
+                }
+            });
+        }
+    });
+}
+</script>
+

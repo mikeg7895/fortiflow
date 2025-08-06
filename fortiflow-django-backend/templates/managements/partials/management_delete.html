@@ -1,0 +1,28 @@
+<h3 class="text-lg font-bold mb-4">Eliminar Gestión</h3>
+<form id="management-delete-form" method="post" hx-delete="{% url 'management-delete' object.id %}" hx-target="#modal-delete-management-form-content" hx-swap="outerHTML">
+    {% csrf_token %}
+    <p>¿Estás seguro que deseas eliminar esta gestión?</p>
+    <div class="modal-action flex justify-center gap-2">
+        <button type="submit" class="btn btn-error">Eliminar</button>
+        <button type="button" class="btn" onclick="document.getElementById('delete_management_modal').close()">Cancelar</button>
+    </div>
+</form>
+<script>
+document.getElementById('management-delete-form').addEventListener('htmx:beforeRequest', function () {
+    document.getElementById('submit-spinner')?.classList.remove('hidden');
+});
+
+document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+    const status = evt.detail.xhr.status;
+    if (status === 204) {
+        document.getElementById('delete_management_modal')?.close();
+        Swal.fire(
+            'Gestión eliminada',
+            'La gestión ha sido eliminada exitosamente.',
+            'success'
+        );
+        htmx.trigger('body', 'reload-table');
+    }
+    document.getElementById('submit-spinner')?.classList.add('hidden');
+});
+</script>

@@ -1,0 +1,70 @@
+</table>
+
+{% load pagination_tags %}
+<form method="get" hx-get="{% url 'program-list' %}" hx-target="#tabla-programas" hx-swap="innerHTML" class="flex flex-wrap gap-4 mb-4">
+    <input type="text" name="titulo" value="{{ request.GET.titulo }}" placeholder="Buscar por título" class="input input-bordered w-full max-w-xs" />
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+<table class="table w-full" id="tabla-programas">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Supervisor</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for program in programs %}
+        <tr id="program-row-{{ program.id }}">
+            <td>{{ program.id }}</td>
+            <td>{{ program.title }}</td>
+            <td>{{ program.description|truncatechars:30 }}</td>
+            <td>{{ program.supervisor }}</td>
+            <td>
+                <button class="btn btn-xs btn-warning" 
+                    hx-get="{% url 'program-edit' program.id %}"
+                    hx-target="#modal-edit-program-form-content"
+                    hx-swap="innerHTML"
+                    hx-trigger="click"
+                    onclick="edit_program_modal.showModal()">
+                    Editar
+                </button>
+                <button class="btn btn-xs btn-error" 
+                    onclick="openDeleteProgramModal('{{ program.id }}')">
+                    Eliminar
+                </button>
+                <a href="{% url 'assignment-list-program' program.id %}" class="btn btn-xs btn-info ml-1">
+                    <i class="fa fa-link"></i> Asignaciones
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No hay programas registrados.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if is_paginated %}
+    {% smart_pagination page_obj "#tabla-programs" %}
+{% endif %}
+
+<script>
+    document.body.addEventListener('htmx:afterOnLoad', function(e) {
+        const trigger = e.detail.xhr.getResponseHeader('HX-Trigger');
+        if (trigger === 'programCreated') {
+            add_program_modal.close();
+            Swal.fire('¡Creado!', 'El programa ha sido creado exitosamente.', 'success');
+            htmx.trigger(document.body, 'programCreated');
+        } else if (trigger === 'programUpdated') {
+            add_program_modal.close();
+            Swal.fire('¡Actualizado!', 'El programa ha sido actualizado.', 'success');
+            htmx.trigger(document.body, 'programUpdated');
+        } else if (trigger === 'programDeleted') {
+            Swal.fire('¡Eliminado!', 'El programa ha sido eliminado.', 'success');
+            htmx.trigger(document.body, 'programDeleted');
+        }
+    });
+</script>
