@@ -5,7 +5,7 @@
     <input type="text" name="titulo" value="{{ request.GET.titulo }}" placeholder="Buscar por título" class="input input-bordered w-full max-w-xs" />
     <button type="submit" class="btn btn-primary">Filtrar</button>
 </form>
-<table class="table w-full" id="tabla-programas">
+<table class="custom-table" id="tabla-programas">
     <thead>
         <tr>
             <th>ID</th>
@@ -42,7 +42,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="5">No hay programas registrados.</td>
+            <td colspan="12" style="text-align: center;">No hay programas registrados.</td>
         </tr>
         {% endfor %}
     </tbody>

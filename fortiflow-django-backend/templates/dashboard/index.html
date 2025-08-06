@@ -6,4 +6,209 @@
 
 {% block content %}
 
+<div class="parent">
+    <div class="div1">
+        <h4>Resumen diario</h4>
+        <div class="card">
+            <div class="card-body">
+                <div class="card-da">
+                    <h1>$1.250.000</h1>
+                    <div class="da-body">
+                        <h3>Próximos por cobrar</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="div2">
+        <h4>Facturación pendiente</h4>
+        <div class="card">
+            <div class="card-body">
+                <div class="card-da">
+                    <h1>24</h1>
+                    <div class="da-body">
+                        <h3>Facturas pendientes</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="div3">
+        <h4>Progreso mensual</h4>
+        <div class="card">
+            <div class="card-body">
+                <div class="card-da">
+                    <h1>72%</h1>
+                    <div class="da-body">
+                        <h3>Proximos por cobrar</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="div4">
+        <h4>Recuperación mensual</h4>
+        <div class="card">
+            <div class="card-body">
+                <div id="container1"></div>
+            </div>
+        </div>
+    </div>
+    <div class="div5">
+        <h4>Próximos cobros</h4>
+        <div class="card">
+            <div class="card-body">
+                <h3>Próximos por cobrar</h3>
+                <table class="custom-table">
+                    <tbody>
+                        <tr>
+                            <td><i class="fa-solid fa-calendar" style="margin-right: 12px;"></i>Ana Perez</td>
+                            <td>$350.000</td>
+                            <td>24 Jul</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa-solid fa-calendar" style="margin-right: 12px;"></i>Carlos Ruiz</td>
+                            <td>$120.000</td>
+                            <td>25 Jul</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa-solid fa-calendar" style="margin-right: 12px;"></i>Jorge Mena</td>
+                            <td>$870.000</td>
+                            <td>27 Jul</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa-solid fa-calendar" style="margin-right: 12px;"></i>Stephen Perez</td>
+                            <td>$600.000</td>
+                            <td>28 Jul</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="div6">
+        <div class="card">
+            <div class="card-body">
+                <div id="container"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        Highcharts.chart('container', {
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: 'Monthly Average Temperature'
+            },
+            subtitle: {
+                text: 'Source: ' +
+                    '<a href="https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature" ' +
+                    'target="_blank">Wikipedia.com</a>'
+            },
+            xAxis: {
+                categories: [
+                    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+                    'Oct', 'Nov', 'Dec'
+                ]
+            },
+            yAxis: {
+                title: {
+                    text: 'Temperature (°C)'
+                }
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: true
+                    },
+                    enableMouseTracking: false
+                }
+            },
+            series: [{
+                name: 'Reggane',
+                data: [
+                    16.0, 18.2, 23.1, 27.9, 32.2, 36.4, 39.8, 38.4, 35.5, 29.2,
+                    22.0, 17.8
+                ]
+            }, {
+                name: 'Tallinn',
+                data: [
+                    -2.9, -3.6, -0.6, 4.8, 10.2, 14.5, 17.6, 16.5, 12.0, 6.5,
+                    2.0, -0.9
+                ]
+            }]
+        });
+
+        Highcharts.chart('container1', {
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'Historic World Population by Region'
+            },
+            subtitle: {
+                text: 'Source: <a ' +
+                    'href="https://en.wikipedia.org/wiki/List_of_continents_and_continental_subregions_by_population"' +
+                    'target="_blank">Wikipedia.org</a>'
+            },
+            xAxis: {
+                categories: ['Africa', 'America', 'Asia', 'Europe'],
+                title: {
+                    text: null
+                },
+                gridLineWidth: 1,
+                lineWidth: 0
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Population (millions)',
+                    align: 'high'
+                },
+                labels: {
+                    overflow: 'justify'
+                },
+                gridLineWidth: 0
+            },
+            tooltip: {
+                valueSuffix: ' millions'
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: '50%',
+                    dataLabels: {
+                        enabled: true
+                    },
+                    groupPadding: 0.1
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                x: -40,
+                y: 80,
+                floating: true,
+                borderWidth: 1,
+                backgroundColor: 'var(--highcharts-background-color, #ffffff)',
+                shadow: true
+            },
+            credits: {
+                enabled: false
+            },
+            series: [{
+                name: 'Year 1990',
+                data: [632, 727, 3202, 721]
+            }, {
+                name: 'Year 2000',
+                data: [814, 841, 3714, 726]
+            }, {
+                name: 'Year 2021',
+                data: [1393, 1031, 4695, 745]
+            }]
+        });
+    </script>
+</div>
+
 {% endblock %}

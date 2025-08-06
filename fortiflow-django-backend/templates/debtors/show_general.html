@@ -2,10 +2,10 @@
 {% block title %}Deudores{% endblock %}
 {% block title-header %}Deudores{% endblock %}
 {% block content %}
-<div class="card card-border bg-base-100">
+<div class="">
     <div class="card-body">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="card-title">Deudores</h2>
+            <h2 class="card-title title-main">Deudores</h2>
             <div>
                 <button class="btn btn-primary" hx-get="{% url 'debtor-create' %}" hx-target="#modal-form-content"
                     hx-swap="innerHTML" hx-trigger="click"
@@ -15,7 +15,7 @@
                 <a class="btn btn-tertiary" href="{% url 'portfolio-list-general' %}">Volver</a>
             </div>
         </div>
-        <div class="overflow-x-auto">
+        <div class="table-container">
             <div id="tabla-deudores" hx-get="{% url 'debtor-list' %}"
                 hx-trigger="load, debtorCreated from:body, debtorUpdated from:body, debtorDeleted from:body, reload-table from:body"
                 hx-target="#tabla-deudores" hx-swap="innerHTML">

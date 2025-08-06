@@ -5,19 +5,21 @@
 {% block title-header %}Clientes{% endblock %}
 
 {% block content %}
-<div class="card card-border bg-base-100">  
+<div class="">  
     <div class="card-body">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="card-title">Clientes</h2>
+            <h2 class="card-title title-main">Clientes</h2>
             <button class="btn btn-primary" onclick="add_client_modal.showModal()">Agregar</button>
         </div>
-        <div class="overflow-x-auto">
+        <div class="table-container">
             <div id="tabla-clientes"
                  hx-get="{% url 'client-list' %}" 
                  hx-trigger="load, clientCreated from:body, reload-table from:body"
                  hx-target="#tabla-clientes" 
                  hx-swap="innerHTML">
-                Cargando clientes...
+                <div style="width: 100%; text-align: center; padding: 10px 5px; box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+                    Cargando clientes...
+                </div>
             </div>
         </div>
     </div>
