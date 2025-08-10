@@ -1,6 +1,30 @@
 {% extends 'layouts/base.html' %}
+
 {% block title %}Deudores{% endblock %}
-{% block title-header %}Deudores{% endblock %}
+
+{% block page_title %}Deudores{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+    <span class="flex items-center gap-2 text-blue-600 font-semibold">
+        <i class="fas fa-user-tie text-xs"></i>
+        <span>Deudores</span>
+    </span>
+</li>
+{% endblock %}
+
+{% block title-header %}
+<div class="flex items-center gap-3">
+    <div class="bg-gradient-to-r from-red-600 to-pink-600 p-3 rounded-xl shadow-lg">
+        <i class="fas fa-user-tie text-white text-xl"></i>
+    </div>
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Gestión de Deudores</h1>
+        <p class="text-sm text-gray-600">Base de datos de deudores</p>
+    </div>
+</div>
+{% endblock %}
 {% block content %}
 <div class="">
     <div class="card-body">
@@ -17,7 +41,7 @@
         </div>
         <div class="table-container">
             <div id="tabla-deudores" hx-get="{% url 'debtor-list' %}"
-                hx-trigger="load, debtorCreated from:body, debtorUpdated from:body, debtorDeleted from:body, reload-table from:body"
+                hx-trigger="load, reload-table from:body"
                 hx-target="#tabla-deudores" hx-swap="innerHTML">
                 Cargando deudores...
             </div>

@@ -1,5 +1,9 @@
 <h3 class="text-lg font-bold mb-4">Editar Deudor</h3>
-<form method="post" hx-post="{% url 'debtor-edit' form.instance.pk %}" hx-target="#modal-form-content" class="space-y-4 mt-5">
+<form method="post" 
+      hx-post="{% url 'debtor-edit' form.instance.pk %}" 
+      hx-target="#modal-form-content" 
+      data-form-type="debtor-edit"
+      class="space-y-4 mt-5">
     {% csrf_token %}
     {% if form.non_field_errors %}
     <div class="alert alert-error shadow-lg mb-4">
@@ -74,7 +78,7 @@
             Cancelar
         </button>
         <button type="submit" class="btn btn-primary">
-            <span class="loading loading-spinner loading-sm" id="submit-spinner"></span>
+            <span class="loading loading-spinner loading-sm hidden" id="submit-spinner"></span>
             Guardar Cambios
         </button>
     </div>
@@ -83,17 +87,8 @@
     document.querySelector('form').addEventListener('htmx:beforeRequest', function() {
         document.getElementById('submit-spinner').classList.remove('hidden');
     });
-    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
-        const status = evt.detail.xhr.status;
-        if (status === 204) {
-            edit_debtor_modal.close();
-            Swal.fire(
-                'Deudor actualizado',
-                'El deudor ha sido actualizado exitosamente.',
-                'success'
-            );
-            htmx.trigger('body', 'reload-table');
-        }
+    
+    document.querySelector('form').addEventListener('htmx:afterRequest', function() {
         document.getElementById('submit-spinner').classList.add('hidden');
     });
 </script>

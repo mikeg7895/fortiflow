@@ -1,35 +1,75 @@
 {% load pagination_tags %}
 
-<form method="get" hx-get="{% url 'portfolio-list-general' %}" hx-trigger="change" hx-target="#tabla-portafolio-general" hx-swap="innerHTML" class="flex gap-4 items-center mb-4">
-    <div>
-        <label>Cliente: {{ selected_client_id }}</label>
-        <select name="cliente_id" class="form-control">
-            <option value="">Todos</option>
-            {% for client in clients %}
-                <option value="{{ client.id }}" {% if client.id|stringformat:"s" == selected_client_id %}selected{% endif %}>
-                    {{ client.name }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
+<form method="get" hx-get="{% url 'portfolio-list-general' %}" hx-trigger="change from:select, input delay:500ms from:input[name='nombre'], input delay:500ms from:input[name='descripcion'], submit" hx-target="#tabla-portafolio-general" hx-swap="innerHTML" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
+    <div class="flex flex-wrap gap-4 items-end">
+        <div class="min-w-[200px]">
+            <label for="cliente_id" class="block text-sm font-medium text-gray-700 mb-2">Cliente:</label>
+            <select name="cliente_id" id="cliente_id" class="select select-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <option value="">Todos los clientes</option>
+                {% for client in clients %}
+                    <option value="{{ client.id }}" {% if client.id|stringformat:"s" == selected_client_id %}selected{% endif %}>
+                        {{ client.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <div>
-        <label>Contrato:</label>
-        <select name="contrato_id" class="form-control">
-            <option value="">Todos</option>
-            {% for contract in contracts %}
-                <option value="{{ contract.id }}" {% if contract.id|stringformat:"s" == selected_contract_id %}selected{% endif %}>
-                    {{ contract.start_date }} - {{ contract.end_date }}
-                </option>
-            {% endfor %}
-        </select>
+        <div class="min-w-[250px]">
+            <label for="contrato_id" class="block text-sm font-medium text-gray-700 mb-2">Contrato:</label>
+            <select name="contrato_id" id="contrato_id" class="select select-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500" {% if not selected_client_id %}disabled{% endif %}>
+                <option value="">Todos los contratos</option>
+                {% if selected_client_id %}
+                    {% for contract in contracts %}
+                        <option value="{{ contract.id }}" {% if contract.id|stringformat:"s" == selected_contract_id %}selected{% endif %}>
+                            ID: {{ contract.id }} | {{ contract.start_date }} - {{ contract.end_date }}
+                        </option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+
+        <div class="min-w-[200px]">
+            <label for="estado" class="block text-sm font-medium text-gray-700 mb-2">Estado:</label>
+            <select name="estado" id="estado" class="select select-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <option value="">Todos los estados</option>
+                <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Activo</option>
+                <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Inactivo</option>
+            </select>
+        </div>
+
+        <div class="min-w-[200px]">
+            <label for="nombre" class="block text-sm font-medium text-gray-700 mb-2">Nombre:</label>
+            <input type="text" 
+                   name="nombre" 
+                   id="nombre" 
+                   value="{{ request.GET.nombre }}" 
+                   placeholder="Buscar por nombre..."
+                   class="input input-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+        </div>
+
+        <div class="min-w-[200px]">
+            <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-2">Descripción:</label>
+            <input type="text" 
+                   name="descripcion" 
+                   id="descripcion" 
+                   value="{{ request.GET.descripcion }}" 
+                   placeholder="Buscar por descripción..."
+                   class="input input-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search mr-2"></i>
+                Filtrar
+            </button>
+        </div>
     </div>
 </form>
 
-<table class="custom-table">
+<table class="custom-table" id="tabla-portafolio-general">
     <thead>
         <tr>
-            <th></th>
+            <th>ID</th>
             <th>Nombre</th>
             <th>Descripción</th>
             <th>Cliente</th>
@@ -44,7 +84,7 @@
     <tbody>
         {% for portfolio in portfolios %}
             <tr>
-                <th>{{ portfolio.id }}</th>
+                <td>{{ portfolio.id }}</td>
                 <td>{{ portfolio.name }}</td>
                 <td>{{ portfolio.description|truncatechars:30 }}</td>
                 <td>{{ portfolio.contract.client.name }}</td>
@@ -54,9 +94,50 @@
                 <td>{{ portfolio.delinquency_percentage }}%</td>
                 <td>{{ portfolio.status }}</td>
                 <td>
-                    <a class="btn btn-primary btn-xs" href="/portfolio/{{ portfolio.id }}/obligations/">Ver</a>
-                    <button class="btn btn-primary btn-xs" hx-get="{% url 'portfolio-edit' portfolio.id portfolio.contract.id %}" hx-target="#modal-edit-form-content" hx-trigger="click" onclick="edit_portfolio_modal.showModal()">Editar</button>
-                    <button class="btn btn-error btn-xs" onclick="confirmDeletePortfolio({{ portfolio.id }})">Eliminar</button>
+                    <div class="relative group">
+                        <!-- Botón de los 3 puntos -->
+                        <button type="button" class="peer p-2 tooltip" data-tip="Más acciones" style="cursor: pointer;">
+                            <i class="fas fa-ellipsis-v text-gray-600"></i>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div class="absolute right-0 z-10 hidden group-focus-within:block dropdown-main bg-white shadow-lg rounded-lg border min-w-[150px]">
+                            <ul class="py-2">
+                                <li>
+                                    <a class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left text-sm" 
+                                       href="/portfolio/{{ portfolio.id }}/obligations/">
+                                        <i class="fas fa-eye text-blue-500"></i>
+                                        <span>Ver obligaciones</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <button class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left text-sm" 
+                                            style="cursor: pointer;"
+                                            hx-get="{% url 'portfolio-edit' portfolio.id portfolio.contract.id %}" 
+                                            hx-target="#modal-edit-form-content" 
+                                            hx-trigger="click" 
+                                            onclick="edit_portfolio_modal.showModal()">
+                                        <i class="fas fa-edit text-green-500"></i>
+                                        <span>Editar</span>
+                                    </button>
+                                </li>
+                                <li>
+                                    <hr class="my-1">
+                                </li>
+                                <li>
+                                    <button class="flex items-center gap-3 px-4 py-2 hover:bg-red-50 w-full text-left text-sm" 
+                                            style="cursor: pointer;" 
+                                            hx-delete="{% url 'portfolio-delete' portfolio.id %}"
+                                            hx-target="body"
+                                            hx-swap="none"
+                                            data-form-type="portfolio-delete">
+                                        <i class="fas fa-trash-alt text-red-500"></i>
+                                        <span class="text-red-600">Eliminar</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </td>
             </tr>
         {% empty %}
@@ -67,36 +148,76 @@
     </tbody>
 </table>
 {% if is_paginated %}
-    {% smart_pagination page_obj "#tabla-clientes" %}
+    {% smart_pagination page_obj "#tabla-portafolio-general" %}
 {% endif %}
 
 <script>
-    function confirmDeletePortfolio(portfolioId) {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: 'Esta acción eliminará el portafolio permanentemente.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                htmx.ajax('DELETE', `/portfolio/delete/${portfolioId}/`, {
-                    target: 'body',
-                    swap: 'none'  
-                });
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    const clienteSelect = document.getElementById('cliente_id');
+    const contratoSelect = document.getElementById('contrato_id');
+    const form = document.querySelector('form');
+    const tabla = document.getElementById('tabla-portafolio-general');
+    
+    // Función para cargar contratos por cliente
+    function loadContractsByClient(clientId) {
+        if (clientId) {
+            // Mostrar mensaje de carga
+            contratoSelect.innerHTML = '<option value="">Cargando contratos...</option>';
+            contratoSelect.disabled = false;
+            
+            // Hacer petición HTMX para obtener contratos
+            htmx.ajax('GET', '/portfolio/contracts/by-client/?client_id=' + clientId, {
+                target: '#contrato_id',
+                swap: 'innerHTML'
+            });
+        } else {
+            // Limpiar y deshabilitar
+            contratoSelect.innerHTML = '<option value="">Todos los contratos</option>';
+            contratoSelect.disabled = true;
+            
+            // Disparar el filtro automáticamente cuando se selecciona "Todos los clientes"
+            htmx.trigger(form, 'submit');
+        }
+    }
+    
+    // Escuchar cambios en el select de cliente
+    clienteSelect.addEventListener('change', function() {
+        const clientId = this.value;
+        // Resetear selección de contrato
+        contratoSelect.value = '';
+        
+        // Cargar contratos del cliente seleccionado
+        loadContractsByClient(clientId);
+    });
+    
+    // Escuchar cuando HTMX actualice el select de contratos
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        if (evt.target.id === 'contrato_id') {
+            // Después de cargar los contratos, asegurar que esté habilitado
+            contratoSelect.disabled = false;
+        }
+    });
+    
+    // Escuchar evento reload-table para actualizar la tabla después de crear/editar portfolios
+    document.body.addEventListener('reload-table', function() {
+        if (tabla) {
+            htmx.trigger(form, 'submit');
+        }
+    });
+    
+    // También escuchar en la tabla directamente
+    if (tabla) {
+        tabla.addEventListener('reload-table', function() {
+            htmx.trigger(form, 'submit');
         });
     }
-
-    document.body.addEventListener('portfolioDeleted', () => {
-        htmx.trigger('body', 'portfolioUpdated');
-        Swal.fire(
-            'Eliminado',
-            'El portafolio ha sido eliminado.',
-            'success'
-        );
-    });
+    
+    // Inicializar el estado al cargar la página
+    const initialClientId = clienteSelect.value;
+    if (!initialClientId) {
+        contratoSelect.disabled = true;
+    } else {
+        contratoSelect.disabled = false;
+    }
+});
 </script>

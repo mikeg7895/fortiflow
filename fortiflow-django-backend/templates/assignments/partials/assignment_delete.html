@@ -1,4 +1,4 @@
-<form id="assignment-delete-form" method="post" hx-delete="" hx-target="#tabla-assignments" hx-swap="innerHTML" class="space-y-4">
+<form id="assignment-delete-form" method="post" hx-delete="" hx-target="#tabla-assignments" hx-swap="innerHTML" data-form-type="assignment-delete" class="space-y-4">
     {% csrf_token %}
     <p>¿Estás seguro que deseas eliminar esta asignación?</p>
     <div class="modal-action">
@@ -6,42 +6,22 @@
         <button type="button" class="btn" onclick="delete_assignment_modal.close()">Cancelar</button>
     </div>
 </form>
+
 <script>
-    document.body.addEventListener('htmx:afterOnLoad', function(e) {
-        const trigger = e.detail.xhr.getResponseHeader('HX-Trigger');
-        if (trigger === 'reload-table') {
-            delete_assignment_modal.close();
-            setTimeout(() => Swal.fire('¡Eliminado!', 'La asignación ha sido eliminada.', 'success'), 250);
-        }
-    });
     function openDeleteAssignmentModal(id, isGeneral) {
         const modal = document.getElementById('delete_assignment_modal');
         const form = document.getElementById('assignment-delete-form');
-        // Limpia cualquier valor anterior
-        form.setAttribute('hx-delete', '');
-        form.removeAttribute('action');
-        modal.dataset.id = id;
-        // Siempre setea la URL de borrado
+        
+        // Setear la URL de eliminación
         form.setAttribute('hx-delete', `/management/assignments/delete/${id}/`);
-        // Cambia el target según la vista
+        
+        // Cambiar el target según la vista
         if (isGeneral) {
             form.setAttribute('hx-target', '#tabla-assignments-general');
         } else {
             form.setAttribute('hx-target', '#tabla-assignments');
         }
+        
         modal.showModal();
     }
-    document.getElementById('assignment-delete-form').addEventListener('submit', function(e) {
-        const modal = document.getElementById('delete_assignment_modal');
-        const id = modal.dataset.id;
-        // Si por alguna razón no está bien seteado, cancela el envío
-        if (!id) {
-            e.preventDefault();
-            return false;
-        }
-        this.setAttribute('hx-delete', `/management/assignments/delete/${id}/`);
-    });
-    document.getElementById('delete_assignment_modal').addEventListener('close', function() {
-        document.getElementById('assignment-delete-form').setAttribute('hx-delete', '');
-    });
 </script>

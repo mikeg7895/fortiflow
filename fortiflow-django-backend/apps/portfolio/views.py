@@ -8,7 +8,7 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.views import View
 from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.urls import reverse_lazy
-from core.mixins import SmartPaginationMixin
+from core.mixins import SmartPaginationMixin, HTMXResponseMixin, HTMXDeleteMixin
 import os
 from apps.client.models import Contract
 from apps.client.models import Client
@@ -30,6 +30,19 @@ class ObligationListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
         portfolio_id = self.kwargs.get('portfolio_id', None)
         if portfolio_id:
             queryset = queryset.filter(portfolio_id=portfolio_id)
+        
+        # Filtros de búsqueda
+        deudor_nombre = self.request.GET.get('deudor_nombre', '').strip()
+        tipo_portfolio = self.request.GET.get('tipo_portfolio', '').strip()
+        estado = self.request.GET.get('estado', '').strip()
+        
+        if deudor_nombre:
+            queryset = queryset.filter(debtor__name__icontains=deudor_nombre)
+        if tipo_portfolio:
+            queryset = queryset.filter(portfolio_type=tipo_portfolio)
+        if estado:
+            queryset = queryset.filter(status__icontains=estado)
+            
         return queryset.select_related('debtor').order_by('-id')
 
     def get_template_names(self):
@@ -52,11 +65,14 @@ class ObligationListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
                 context['portfolio'] = Portfolio.objects.get(pk=portfolio_id)
             except Portfolio.DoesNotExist:
                 context['portfolio'] = None
+        context['request'] = self.request
         return context
 
-class ObligationCreateView(LoginRequiredMixin, CreateView):
+class ObligationCreateView(LoginRequiredMixin, HTMXResponseMixin, CreateView):
     model = Obligation
     form_class = ObligationForm
+    success_message = "La obligación ha sido creada exitosamente."
+    
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
             return ["obligations/partials/obligation_create.html"]
@@ -65,11 +81,7 @@ class ObligationCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         portfolio_id = self.kwargs.get('portfolio_id')
         form.instance.portfolio_id = portfolio_id
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            from django.http import HttpResponse
-            return HttpResponse(status=204, headers={'HX-Trigger': 'reload-table'})
-        return response
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse('obligation-list', kwargs={'portfolio_id': self.kwargs.get('portfolio_id')})
@@ -79,37 +91,27 @@ class ObligationCreateView(LoginRequiredMixin, CreateView):
         context['portfolio_id'] = self.kwargs.get('portfolio_id')
         return context
 
-class ObligationEditView(LoginRequiredMixin, UpdateView):
+class ObligationEditView(LoginRequiredMixin, HTMXResponseMixin, UpdateView):
     model = Obligation
     form_class = ObligationForm
+    success_message = "La obligación ha sido actualizada exitosamente."
+    
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
             return ["obligations/partials/obligation_edit.html"]
         return ["obligations/partials/obligation_form.html"]
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            from django.http import HttpResponse
-            return HttpResponse(status=204, headers={'HX-Trigger': 'reload-table'})
-        return response
-
     def get_success_url(self):
         return reverse('obligation-list', kwargs={'portfolio_id': self.object.portfolio_id})
 
-class ObligationDeleteView(LoginRequiredMixin, DeleteView):
+class ObligationDeleteView(LoginRequiredMixin, HTMXDeleteMixin, DeleteView):
     model = Obligation
+    delete_success_message = "La obligación ha sido eliminada exitosamente."
+    
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
             return ["obligations/partials/obligation_delete.html"]
         return ["obligations/partials/obligation_confirm_delete.html"]
-
-    def delete(self, request, *args, **kwargs):
-        response = super().delete(request, *args, **kwargs)
-        if self.request.headers.get('HX-Request'):
-            from django.http import HttpResponse
-            return HttpResponse(status=204, headers={'HX-Trigger': 'reload-table'})
-        return response
 
     def get_success_url(self):
         return reverse('obligation-list', kwargs={'portfolio_id': self.object.portfolio_id})
@@ -137,6 +139,18 @@ class PortfolioListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
 
         if contract_id:
             queryset = queryset.filter(contract_id=contract_id)
+        
+        # Filtros de búsqueda por nombre o descripción
+        nombre = self.request.GET.get('nombre', '').strip()
+        descripcion = self.request.GET.get('descripcion', '').strip()
+        estado = self.request.GET.get('estado', '').strip()
+        
+        if nombre:
+            queryset = queryset.filter(name__icontains=nombre)
+        if descripcion:
+            queryset = queryset.filter(description__icontains=descripcion)
+        if estado:
+            queryset = queryset.filter(status=estado)
 
         return queryset.order_by('-date_created')
 
@@ -160,16 +174,28 @@ class PortfolioListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
             context['contract'] = Contract.objects.get(pk=pk)
         else:
             context['clients'] = Client.objects.filter(tenant=self.request.user.tenant)
-            context['contracts'] = Contract.objects.filter(client__tenant=self.request.user.tenant)
+            
+            # Solo cargar contratos si hay un cliente seleccionado
+            if selected_client_id:
+                context['contracts'] = Contract.objects.filter(
+                    client_id=selected_client_id, 
+                    client__tenant=self.request.user.tenant
+                )
+            else:
+                context['contracts'] = Contract.objects.none()
+                
             context['selected_client_id'] = selected_client_id
             context['selected_contract_id'] = selected_contract_id
+        
+        context['request'] = self.request
         return context
 
 
-class PortfolioCreateView(LoginRequiredMixin, CreateView):
+class PortfolioCreateView(LoginRequiredMixin, HTMXResponseMixin, CreateView):
     model = Portfolio
     form_class = PortfolioForm
     template_name = "portfolio/partials/portfolio_create.html"
+    success_message = "El portfolio ha sido creado exitosamente."
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -185,15 +211,6 @@ class PortfolioCreateView(LoginRequiredMixin, CreateView):
             else:
                 kwargs['contract'] = None
         return kwargs
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            return HttpResponse(
-                status=204,
-                headers={'HX-Trigger': 'portfolioCreated'}
-            )
-        return response
 
     def get_success_url(self):
         contract_id = self.kwargs.get('pk') or self.request.POST.get('contract')
@@ -217,30 +234,29 @@ class PortfolioCreateView(LoginRequiredMixin, CreateView):
 class ContractListByClientView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         client_id = request.GET.get('client_id')
-        contracts = Contract.objects.filter(client_id=client_id)
+        if client_id:
+            contracts = Contract.objects.filter(
+                client_id=client_id, 
+                client__tenant=request.user.tenant
+            )
+        else:
+            contracts = Contract.objects.none()
+        
         html = render_to_string('portfolio/partials/contract_options.html', {'contracts': contracts})
         return HttpResponse(html)
 
 
-class PortfolioEditView(LoginRequiredMixin, UpdateView):
+class PortfolioEditView(LoginRequiredMixin, HTMXResponseMixin, UpdateView):
     model = Portfolio
     form_class = PortfolioForm
     template_name = "portfolio/partials/portfolio_edit.html"
+    success_message = "El portfolio ha sido actualizado exitosamente."
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         kwargs['contract'] = Contract.objects.get(pk=self.kwargs.get('contract_id'))
         return kwargs
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            return HttpResponse(
-                status=204,
-                headers={'HX-Trigger': 'portfolioCreated'}
-            )
-        return response
     
     def get_success_url(self):
         return reverse_lazy('portfolio-list', kwargs={'pk': self.kwargs.get('pk')})
@@ -251,23 +267,19 @@ class PortfolioEditView(LoginRequiredMixin, UpdateView):
         return context
         
 
-class PortfolioDeleteView(LoginRequiredMixin, View):
-    def delete(self, request, pk, *args, **kwargs):
-        try:
-            portfolio = Portfolio.objects.get(pk=pk)
-            try:
-                os.remove(portfolio.logo.path)
-            except:
-                pass
-            portfolio.delete()
-            return HttpResponse(status=204, headers={'HX-Trigger': 'portfolioDeleted'})
-        except Portfolio.DoesNotExist:
-            return HttpResponse(status=404)
+class PortfolioDeleteView(LoginRequiredMixin, HTMXDeleteMixin, DeleteView):
+    model = Portfolio
+    delete_success_message = "El portfolio ha sido eliminado exitosamente."
     
-    def dispatch(self, request, *args, **kwargs):
-        if request.method.lower() != 'delete':
-            return HttpResponseNotAllowed(['DELETE'])
-        return super().dispatch(request, *args, **kwargs)
+    def delete(self, request, *args, **kwargs):
+        """Custom delete to handle logo file removal"""
+        portfolio = self.get_object()
+        try:
+            if portfolio.logo:
+                os.remove(portfolio.logo.path)
+        except:
+            pass
+        return super().delete(request, *args, **kwargs)
 
 class DebtorListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
     model = Debtor
@@ -300,55 +312,37 @@ class DebtorListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
         context['request'] = self.request
         return context
     
-class DebtorCreateView(LoginRequiredMixin, CreateView):
+class DebtorCreateView(LoginRequiredMixin, HTMXResponseMixin, CreateView):
     model = Debtor
     form_class = DebtorForm
     template_name = "debtors/partials/debtor_create.html"
-    success_url = reverse_lazy('debtor-list') 
+    success_message = "El deudor ha sido creado exitosamente."
+    
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
+    
+    def get_success_url(self):
+        return reverse_lazy('debtor-list')
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            return HttpResponse(
-                status=204,
-                headers={'HX-Trigger': 'debtorCreated'}
-            )
-        return response
-
-class DebtorEditView(LoginRequiredMixin, UpdateView):
+class DebtorEditView(LoginRequiredMixin, HTMXResponseMixin, UpdateView):
     model = Debtor
     form_class = DebtorForm
     template_name = "debtors/partials/debtor_edit.html"
-    success_url = reverse_lazy('debtor-list') 
+    success_message = "El deudor ha sido actualizado exitosamente."
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            return HttpResponse(
-                status=204,
-                headers={'HX-Trigger': 'debtorUpdated'}
-            )
-        return response
-
-class DebtorDeleteView(LoginRequiredMixin, View):
-    def delete(self, request, pk, *args, **kwargs):
-        try:
-            debtor = Debtor.objects.get(pk=pk)
-            debtor.delete()
-            return HttpResponse(status=204, headers={'HX-Trigger': 'debtorDeleted'})
-        except Debtor.DoesNotExist:
-            return HttpResponse(status=404)
     
-    def dispatch(self, request, *args, **kwargs):
-        if request.method.lower() != 'delete':
-            return HttpResponseNotAllowed(['DELETE'])
-        return super().dispatch(request, *args, **kwargs)
+    def get_success_url(self):
+        return reverse_lazy('debtor-list')
+
+class DebtorDeleteView(LoginRequiredMixin, HTMXDeleteMixin, DeleteView):
+    model = Debtor
+    success_message = "El deudor ha sido eliminado exitosamente."
+    
+    def get_success_url(self):
+        return reverse_lazy('debtor-list')

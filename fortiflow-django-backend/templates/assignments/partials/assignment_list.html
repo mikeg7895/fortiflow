@@ -27,11 +27,52 @@
             <td>{{ assignment.debtor.name }}</td>
             <td>{{ assignment.created_at|date:'Y-m-d H:i' }}</td>
             <td>
-                <button class="btn btn-xs btn-warning"
-                    hx-get="{% if program %}{% url 'assignment-edit-program' assignment.id program.id %}{% else %}{% url 'assignment-edit' assignment.id %}{% endif %}"
-                    hx-target="#modal-edit-assignment-form-content" hx-swap="innerHTML" hx-trigger="click" onclick="edit_assignment_modal.showModal()">Editar</button>
-                <a href="{% url 'management-list' assignment.id %}" class="btn btn-xs btn-info">Management</a>
-                <button class="btn btn-xs btn-error" onclick="openDeleteAssignmentModal('{{ assignment.id }}', false)">Eliminar</button>
+                <div class="relative group">
+                    <!-- Botón de los 3 puntos -->
+                    <button type="button" class="peer p-2 tooltip" data-tip="Más acciones" style="cursor: pointer;">
+                        <i class="fas fa-ellipsis-v text-gray-600"></i>
+                    </button>
+
+                    <!-- Dropdown -->
+                    <div class="absolute right-0 z-10 hidden group-focus-within:block dropdown-main bg-white shadow-lg rounded-lg border min-w-[170px]">
+                        <ul class="py-2">
+                            <li>
+                                <button class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left text-sm" 
+                                        style="cursor: pointer;"
+                                        hx-get="{% if program %}{% url 'assignment-edit-program' assignment.id program.id %}{% else %}{% url 'assignment-edit' assignment.id %}{% endif %}"
+                                        hx-target="#modal-edit-assignment-form-content" 
+                                        hx-swap="innerHTML" 
+                                        hx-trigger="click" 
+                                        onclick="edit_assignment_modal.showModal()">
+                                    <i class="fas fa-edit text-blue-500"></i>
+                                    <span>Editar</span>
+                                </button>
+                            </li>
+                            <li>
+                                <a href="{% url 'management-list' assignment.id %}" 
+                                   class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left text-sm" 
+                                   style="cursor: pointer;">
+                                    <i class="fas fa-tasks text-green-500"></i>
+                                    <span>Ver gestiones</span>
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="my-1">
+                            </li>
+                            <li>
+                                <button class="flex items-center gap-3 px-4 py-2 hover:bg-red-50 w-full text-left text-sm" 
+                                        style="cursor: pointer;" 
+                                        hx-delete="{% url 'assignment-delete' assignment.id %}"
+                                        hx-target="body"
+                                        hx-swap="none"
+                                        data-form-type="assignment-delete">
+                                    <i class="fas fa-trash-alt text-red-500"></i>
+                                    <span class="text-red-600">Eliminar</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </td>
         </tr>
         {% empty %}
@@ -42,37 +83,4 @@
 {% if is_paginated %}
     {% smart_pagination page_obj "#tabla-assignments" %}
 {% endif %}
-
-
-<script>
-function openDeleteAssignmentModal(id, isGeneral) {
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: 'Esta acción no se puede deshacer.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(`/management/assignments/delete/${id}/`, {
-                method: 'DELETE',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-            }).then(resp => {
-                if (resp.status === 204) {
-                    Swal.fire('¡Eliminado!', 'La asignación ha sido eliminada.', 'success');
-                    htmx.ajax('GET', window.location.pathname, {target: '#tabla-assignments', swap: 'innerHTML'});
-                } else {
-                    Swal.fire('Error', 'No se pudo eliminar la asignación.', 'error');
-                }
-            });
-        }
-    });
-}
-</script>
 

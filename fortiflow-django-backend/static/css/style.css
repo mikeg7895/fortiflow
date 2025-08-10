@@ -125,6 +125,21 @@ select {
     position: relative;
     /* z-index: 0; */
 }
+
+/* Fix para dropdowns en tablas */
+.custom-table tbody tr:has(.group:focus-within) {
+    z-index: 1000;
+}
+
+.custom-table .group .dropdown-main {
+    z-index: 1001 !important;
+}
+
+/* Asegurar que contenedores de tabla no corten dropdowns */
+.table-container,
+.custom-table {
+    overflow: visible !important;
+}
 .custom-table tbody tr td:first-child,
 .custom-table tbody tr td:last-child {
     border-radius: 0;
@@ -238,4 +253,36 @@ h4 {
 h3 {
     font-size: 24px;
     color: #6a6a6a; 
+}
+
+/* Sweet Alert z-index fix */
+.swal2-container {
+    z-index: 999999 !important;
+}
+
+.swal2-popup {
+    z-index: 999999 !important;
+}
+
+/* Clase específica para Sweet Alert de contratos */
+.swal-contract-success {
+    z-index: 999999 !important;
+}
+
+.swal-contract-success .swal2-popup {
+    z-index: 999999 !important;
+}
+
+/* Modal z-index to ensure Sweet Alert is above */
+.modal {
+    z-index: 9999;
+}
+
+.modal-box {
+    z-index: 10000;
+}
+
+/* Forzar que todos los elementos del Sweet Alert estén por encima */
+.swal2-backdrop-show {
+    z-index: 999998 !important;
 }

@@ -14,7 +14,12 @@
     });
 </script>
 {% load static %}
-<form method="post" hx-post="{% url 'program-edit' form.instance.id %}" hx-target="#tabla-programs" hx-swap="innerHTML" class="space-y-4">
+<form method="post" 
+      hx-post="{% url 'program-edit' form.instance.id %}" 
+      hx-target="#tabla-programs" 
+      hx-swap="innerHTML" 
+      data-form-type="program-edit"
+      class="space-y-4">
     {% csrf_token %}
     <div class="form-control">
         <label class="label">Título</label>

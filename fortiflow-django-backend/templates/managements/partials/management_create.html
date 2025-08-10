@@ -1,7 +1,11 @@
 <h3 class="text-lg font-bold mb-4">Crear Gestión</h3>
-<form id="management-create-form" method="post"
-    hx-post="{% url 'management-create' assignment.id %}"
-    hx-target="#modal-management-form-content" hx-swap="outerHTML" class="mt-5">
+<form id="management-create-form" 
+      method="post"
+      hx-post="{% url 'management-create' assignment.id %}"
+      hx-target="#modal-management-form-content" 
+      hx-swap="outerHTML" 
+      data-form-type="management-create"
+      class="mt-5">
     {% csrf_token %}
     {% if form.non_field_errors %}
     <div class="alert alert-error shadow-lg mb-4">
@@ -69,17 +73,7 @@ document.getElementById('management-create-form').addEventListener('htmx:beforeR
     document.getElementById('submit-spinner')?.classList.remove('hidden');
 });
 
-document.body.addEventListener('htmx:afterOnLoad', function (evt) {
-    const status = evt.detail.xhr.status;
-    if (status === 204) {
-        document.getElementById('add_management_modal')?.close();
-        Swal.fire(
-            'Gestión creada',
-            'La gestión ha sido creada exitosamente.',
-            'success'
-        );
-        htmx.trigger('body', 'reload-table');
-    }
+document.getElementById('management-create-form').addEventListener('htmx:afterRequest', function () {
     document.getElementById('submit-spinner')?.classList.add('hidden');
 });
 </script>
