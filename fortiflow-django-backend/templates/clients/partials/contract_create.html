@@ -1,4 +1,4 @@
-<form method="post" hx-post="{% url 'contract-create' client.id %}" hx-target="#modal-form-content" class="space-y-4 mt-5" enctype="multipart/form-data">
+<form method="post" hx-post="{% url 'contract-create' client.id %}" hx-target="#modal-contract-form-content" class="space-y-4 mt-5" enctype="multipart/form-data" id="contract-create-form" data-form-type="contract-create">
     {% csrf_token %}
     
     {% if form.non_field_errors %}
@@ -53,28 +53,28 @@
     </div>
 </form>
 
+<style>
+/* Forzar z-index alto para Sweet Alert en contratos */
+.swal2-container {
+    z-index: 999999 !important;
+}
+.swal2-popup {
+    z-index: 999999 !important;
+}
+.swal-contract-success {
+    z-index: 999999 !important;
+}
+.swal2-backdrop-show {
+    z-index: 999998 !important;
+}
+</style>
+
 <script>
     document.querySelector('form').addEventListener('htmx:beforeRequest', function() {
         document.getElementById('submit-contract-spinner').classList.remove('hidden');
     });
-
-    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
-        const status = evt.detail.xhr.status;
-        if (status === 204) {
-            create_contract_modal.close();
-            Swal.fire(
-                'Contrato creado',
-                'El contrato ha sido creado exitosamente.',
-                'success'
-            ).then(() => {
-                list_contract_modal.showModal();
-                htmx.ajax('GET', '{% url "contract-list" client.id %}', {
-                    target: '#lista-contratos',
-                    swap: 'innerHTML'
-                });
-            });
-        }
-
+    
+    document.querySelector('form').addEventListener('htmx:afterRequest', function() {
         document.getElementById('submit-contract-spinner').classList.add('hidden');
     });
 </script>

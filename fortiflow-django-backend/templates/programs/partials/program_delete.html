@@ -1,4 +1,4 @@
-<form method="post" hx-delete="" hx-target="#tabla-programs" hx-swap="innerHTML" class="space-y-4">
+<form method="post" hx-delete="" hx-target="#tabla-programs" hx-swap="innerHTML" data-form-type="program-delete" class="space-y-4">
     {% csrf_token %}
     <p>¿Estás seguro que deseas eliminar este programa?</p>
     <div class="modal-action">
@@ -6,12 +6,3 @@
         <button type="button" class="btn" onclick="edit_program_modal.close()">Cancelar</button>
     </div>
 </form>
-<script>
-    document.body.addEventListener('htmx:afterOnLoad', function(e) {
-        const trigger = e.detail.xhr.getResponseHeader('HX-Trigger');
-        if (trigger === 'programDeleted') {
-            edit_program_modal.close();
-            setTimeout(() => Swal.fire('¡Eliminado!', 'El programa ha sido eliminado.', 'success'), 250);
-        }
-    });
-</script>

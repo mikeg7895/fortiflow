@@ -1,5 +1,10 @@
 <h3 class="text-lg font-bold">Editar usuario</h3>
-<form method="post" id="modal-edit-form-user" hx-post="{% url 'user-edit' form.instance.pk %}" hx-target="#modal-edit-form-content" class="space-y-4 mt-5">
+<form method="post" 
+      id="modal-edit-form-user" 
+      hx-post="{% url 'user-edit' form.instance.pk %}" 
+      hx-target="#modal-edit-form-content" 
+      data-form-type="user-edit"
+      class="space-y-4 mt-5">
     {% csrf_token %}
     
     {% if form.non_field_errors %}
@@ -120,19 +125,8 @@
     document.querySelector('form').addEventListener('htmx:beforeRequest', function() {
         document.getElementById('submit-spinner-edit').classList.remove('hidden');
     });
-
-    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
-        const status = evt.detail.xhr.status;
-        if (status === 204) {
-            edit_user_modal.close();
-            Swal.fire(
-                'Usuario actualizado',
-                'El usuario ha sido actualizado exitosamente.',
-                'success'
-            );
-            htmx.trigger('#tabla-usuarios', 'reload-table');
-        }
-
+    
+    document.querySelector('form').addEventListener('htmx:afterRequest', function() {
         document.getElementById('submit-spinner-edit').classList.add('hidden');
     });
 </script>

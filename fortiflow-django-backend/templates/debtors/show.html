@@ -17,7 +17,7 @@
         <div class="overflow-x-auto">
             <div id="tabla-deudores"
                  hx-get="{% url 'debtor-list-portfolio' portfolio.id %}"
-                 hx-trigger="load, debtorCreated from:body, debtorUpdated from:body, debtorDeleted from:body, reload-table from:body"
+                 hx-trigger="load, reload-table from:body"
                  hx-target="#tabla-deudores"
                  hx-swap="innerHTML">
                 Cargando deudores...

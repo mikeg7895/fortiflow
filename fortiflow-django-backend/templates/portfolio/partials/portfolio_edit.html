@@ -1,5 +1,10 @@
 <h3 class="text-lg font-bold">Editar Portfolio</h3>
-<form method="post" hx-post="{% url 'portfolio-edit' form.instance.id contract.id %}" hx-target="#modal-form-content" class="space-y-4 mt-5" enctype="multipart/form-data">
+<form method="post" 
+      hx-post="{% url 'portfolio-edit' form.instance.id contract.id %}" 
+      hx-target="#modal-form-content" 
+      data-form-type="portfolio-edit"
+      class="space-y-4 mt-5" 
+      enctype="multipart/form-data">
     {% csrf_token %}
     
     {% if form.non_field_errors %}

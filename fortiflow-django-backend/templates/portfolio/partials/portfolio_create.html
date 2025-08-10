@@ -1,8 +1,18 @@
 <h3 class="text-lg font-bold">Crear Portfolio</h3>
 {% if contract %}
-<form method="post" hx-post="{% url 'portfolio-create' contract.id %}" hx-target="#modal-form-content" class="space-y-4 mt-5" enctype="multipart/form-data">
+<form method="post" 
+      hx-post="{% url 'portfolio-create' contract.id %}" 
+      hx-target="#modal-form-content" 
+      data-form-type="portfolio-create"
+      class="space-y-4 mt-5" 
+      enctype="multipart/form-data">
 {% else %}
-<form method="post" hx-post="{% url 'portfolio-create' 0 %}" hx-target="#modal-form-content" class="space-y-4 mt-5" enctype="multipart/form-data">
+<form method="post" 
+      hx-post="{% url 'portfolio-create' 0 %}" 
+      hx-target="#modal-form-content" 
+      data-form-type="portfolio-create"
+      class="space-y-4 mt-5" 
+      enctype="multipart/form-data">
 {% endif %}
     {% csrf_token %}
     
@@ -94,7 +104,7 @@
             Cancelar
         </button>
         <button type="submit" class="btn btn-primary">
-            <span class="loading loading-spinner loading-sm" id="submit-spinner"></span>
+            <span class="loading loading-spinner loading-sm hidden" id="submit-spinner"></span>
             Guardar Portfolio
         </button>
     </div>
@@ -104,19 +114,8 @@
     document.querySelector('form').addEventListener('htmx:beforeRequest', function() {
         document.getElementById('submit-spinner').classList.remove('hidden');
     });
-
-    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
-        const status = evt.detail.xhr.status;
-        if (status === 204) {
-            add_portfolio_modal.close();
-            Swal.fire(
-                'Portfolio creado',
-                'El portfolio ha sido creado exitosamente.',
-                'success'
-            );
-            htmx.trigger('body', 'reload-table');
-        }
-
+    
+    document.querySelector('form').addEventListener('htmx:afterRequest', function() {
         document.getElementById('submit-spinner').classList.add('hidden');
     });
 </script>

@@ -1,9 +1,49 @@
 {% load pagination_tags %}
-<button class="btn btn-primary" hx-get="{% url 'contract-create' client.id %}" hx-target="#modal-contract-form-content" hx-trigger="click"  onclick="
-list_contract_modal.close();
-create_contract_modal.showModal();
-">Agregar</button>
-<table class="table mt-5">
+
+<div class="contract-list-container">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Lista de Contratos</h3>
+        <button class="btn btn-primary" 
+                hx-get="{% url 'contract-create' client.id %}" 
+                hx-target="#modal-contract-form-content" 
+                hx-trigger="click"  
+                onclick="list_contract_modal.close(); create_contract_modal.showModal();">
+            <i class="fas fa-plus mr-2"></i>
+            Agregar Contrato
+        </button>
+    </div>
+
+    <form method="get" hx-get="{% url 'contract-list' client.id %}" hx-trigger="change from:input, submit" hx-target="#lista-contratos" hx-swap="innerHTML" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div class="flex flex-wrap gap-4 items-end">
+            <div class="min-w-[200px]">
+                <label for="fecha_inicio" class="block text-sm font-medium text-gray-700 mb-2">Desde fecha:</label>
+                <input type="date" 
+                       name="fecha_inicio" 
+                       id="fecha_inicio" 
+                       value="{{ request.GET.fecha_inicio }}" 
+                       class="input input-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+            </div>
+
+            <div class="min-w-[200px]">
+                <label for="fecha_fin" class="block text-sm font-medium text-gray-700 mb-2">Hasta fecha:</label>
+                <input type="date" 
+                       name="fecha_fin" 
+                       id="fecha_fin" 
+                       value="{{ request.GET.fecha_fin }}" 
+                       class="input input-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search mr-2"></i>
+                    Filtrar
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<table class="table mt-5" id="tabla-contratos">
     <thead>
         <tr>
             <th></th>
@@ -19,9 +59,51 @@ create_contract_modal.showModal();
                 <td>{{ contract.start_date }}</td>
                 <td>{{ contract.end_date }}</td>
                 <td>
-                    <button class="btn btn-primary btn-xs" hx-get="{% url 'contract-edit' contract.id %}" hx-target="#modal-contract-edit-form-content" hx-trigger="click" onclick="edit_contract_modal.showModal(); list_contract_modal.close();">Editar</button>
-                    <a class="btn btn-primary btn-xs" href="{% url 'portfolio-list' contract.id %}">Ver</a>
-                    <button class="btn btn-error btn-xs" onclick="confirmDeleteContract({{ contract.id }})">Eliminar</button>
+                    <div class="relative group">
+                        <!-- Botón de los 3 puntos -->
+                        <button type="button" class="peer p-2 tooltip" data-tip="Más acciones" style="cursor: pointer;">
+                            <i class="fas fa-ellipsis-v text-gray-600"></i>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div class="absolute right-0 z-10 hidden group-focus-within:block dropdown-main bg-white shadow-lg rounded-lg border min-w-[170px]">
+                            <ul class="py-2">
+                                <li>
+                                    <button class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left text-sm" 
+                                            style="cursor: pointer;"
+                                            hx-get="{% url 'contract-edit' contract.id %}" 
+                                            hx-target="#modal-contract-edit-form-content" 
+                                            hx-trigger="click" 
+                                            onclick="edit_contract_modal.showModal(); list_contract_modal.close();">
+                                        <i class="fas fa-edit text-blue-500"></i>
+                                        <span>Editar</span>
+                                    </button>
+                                </li>
+                                <li>
+                                    <a class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left text-sm" 
+                                       style="cursor: pointer;"
+                                       href="{% url 'portfolio-list' contract.id %}">
+                                        <i class="fas fa-eye text-green-500"></i>
+                                        <span>Ver portfolios</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="my-1">
+                                </li>
+                                <li>
+                                    <button class="flex items-center gap-3 px-4 py-2 hover:bg-red-50 w-full text-left text-sm" 
+                                            style="cursor: pointer;" 
+                                            hx-delete="{% url 'contract-delete' contract.id %}"
+                                            hx-target="body"
+                                            hx-swap="none"
+                                            data-form-type="contract-delete">
+                                        <i class="fas fa-trash-alt text-red-500"></i>
+                                        <span class="text-red-600">Eliminar</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </td>
             </tr>
         {% empty %}
@@ -33,40 +115,4 @@ create_contract_modal.showModal();
 </table>
 {% if is_paginated %}
     {% smart_pagination page_obj "#tabla-contratos" %}
-{% endif %}
-
-<script>
-    function confirmDeleteContract(userId) {
-        list_contract_modal.close();
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: 'Esta acción eliminará el contrato permanentemente.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                htmx.ajax('DELETE', `/clients/contract/delete/${userId}/`, {
-                    target: 'body',
-                    swap: 'none'  
-                });
-            }else{
-                list_contract_modal.showModal();
-            }
-        });
-    }
-
-    document.body.addEventListener('contractDeleted', () => {
-        htmx.trigger('body', 'contractUpdated');
-        Swal.fire(
-            'Eliminado',
-            'El contrato ha sido eliminado.',
-            'success'
-        ).then(() => {
-            list_contract_modal.showModal();
-        });
-    });
-</script>   
+{% endif %}   

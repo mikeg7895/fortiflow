@@ -1,4 +1,4 @@
-<form method="post" hx-post="{% url 'contract-edit' form.instance.id %}" hx-target="#modal-form-content" class="space-y-4 mt-5" enctype="multipart/form-data">
+<form method="post" hx-post="{% url 'contract-edit' form.instance.id %}" hx-target="#modal-contract-edit-form-content" class="space-y-4 mt-5" enctype="multipart/form-data" id="contract-edit-form" data-form-type="contract-edit">
     {% csrf_token %}
     
     {% if form.non_field_errors %}
@@ -52,22 +52,13 @@
     </div>
 </form>
 
+<style>
+/* Estilos específicos para este template si son necesarios */
+</style>
+
 <script>
-    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
-        const status = evt.detail.xhr.status;
-        if (status === 204) {
-            edit_contract_modal.close();
-            Swal.fire(
-                'Contrato editado',
-                'El contrato ha sido editado exitosamente.',
-                'success'
-            ).then(() => {
-                list_contract_modal.showModal();
-                htmx.ajax('GET', '{% url "contract-list" form.instance.client.id %}', {
-                    target: '#lista-contratos',
-                    swap: 'innerHTML'
-                });
-            });
-        }
+    // Script específico para el comportamiento del modal de contratos
+    document.addEventListener('DOMContentLoaded', function() {
+        // Opcional: lógica específica para este template
     });
 </script>

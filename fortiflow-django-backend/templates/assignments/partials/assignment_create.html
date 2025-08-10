@@ -1,11 +1,15 @@
 <h3 class="text-lg font-bold mb-4">Crear Asignación</h3>
-<form id="assignment-create-form" method="post"
+<form id="assignment-create-form" 
+      method="post"
+      data-form-type="assignment-create"
     {% if program %}
         hx-post="{% url 'assignment-create-program' program.id %}"
     {% else %}
         hx-post="{% url 'assignment-create' %}"
     {% endif %}
-    hx-target="#modal-assignment-form-content" hx-swap="outerHTML" class="space-y-4 mt-5">
+    hx-target="#modal-assignment-form-content" 
+    hx-swap="outerHTML" 
+    class="space-y-4 mt-5">
     {% csrf_token %}
     {% if form.non_field_errors %}
     <div class="alert alert-error shadow-lg mb-4">
@@ -64,19 +68,7 @@
         document.getElementById('submit-spinner')?.classList.remove('hidden');
     });
 
-    document.body.addEventListener('htmx:afterOnLoad', function (evt) {
-        const status = evt.detail.xhr.status;
-        if (status === 204) {
-            if (typeof add_assignment_modal !== 'undefined') {
-                add_assignment_modal.close();
-            }
-            Swal.fire(
-                'Asignación creada',
-                'La asignación ha sido creada exitosamente.',
-                'success'
-            );
-            htmx.trigger('body', 'reload-table');
-        }
+    document.querySelector('form').addEventListener('htmx:afterRequest', function () {
         document.getElementById('submit-spinner')?.classList.add('hidden');
     });
 </script>
