@@ -2,7 +2,36 @@
 
 {% block title %}Portafolio{% endblock %}
 
-{% block title-header %}Portafolio{% endblock %}
+{% block page_title %}Portafolio{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+    <a href="{% url 'client-list' %}" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors duration-200">
+        <i class="fas fa-users text-xs"></i>
+        <span>Clientes</span>
+    </a>
+</li>
+<li>
+    <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+    <span class="flex items-center gap-2 text-blue-600 font-semibold">
+        <i class="fas fa-briefcase text-xs"></i>
+        <span>{{ contract.client.name }}</span>
+    </span>
+</li>
+{% endblock %}
+
+{% block title-header %}
+<div class="flex items-center gap-3">
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-3 rounded-xl shadow-lg">
+        <i class="fas fa-briefcase text-white text-xl"></i>
+    </div>
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Portafolio</h1>
+        <p class="text-sm text-gray-600">{{ contract.client.name }}</p>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
 <div class="">  

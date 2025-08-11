@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.urls import reverse_lazy
 from .models import Program, Assignment, Management
 from .forms import ProgramForm, AssignmentForm
-from core.mixins import SmartPaginationMixin
+from core.mixins import SmartPaginationMixin, HTMXResponseMixin, HTMXDeleteMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
@@ -42,9 +42,10 @@ class ManagementListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
         context['request'] = self.request
         return context
 
-class ManagementCreateView(LoginRequiredMixin, CreateView):
+class ManagementCreateView(LoginRequiredMixin, HTMXResponseMixin, CreateView):
     model = Management
     form_class = ManagementForm
+    success_message = "La gestión ha sido creada exitosamente."
 
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
@@ -58,18 +59,7 @@ class ManagementCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.assignment_id = self.kwargs.get('assignment_id')
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            return HttpResponse(
-                '',
-                status=204,
-                headers={
-                    'HX-Trigger': 'managementCreated, reload-table',
-                    'HX-Reswap': 'none',
-                    'HX-Retarget': 'body'
-                }
-            )
-        return response
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('management-list', kwargs={'assignment_id': self.kwargs.get('assignment_id')})
@@ -80,13 +70,15 @@ class ManagementCreateView(LoginRequiredMixin, CreateView):
         context['assignment'] = Assignment.objects.get(pk=self.kwargs.get('assignment_id'))
         return context
 
-class ManagementEditView(LoginRequiredMixin, UpdateView):
+class ManagementEditView(LoginRequiredMixin, HTMXResponseMixin, UpdateView):
+    model = Management
+    form_class = ManagementForm
+    success_message = "La gestión ha sido actualizada exitosamente."
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         # No modificar initial, solo pasar la instancia
         return kwargs
-    model = Management
-    form_class = ManagementForm
 
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
@@ -102,15 +94,10 @@ class ManagementEditView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse('management-list', args=[self.object.assignment_id])
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            return HttpResponse(status=204)
-        return response
-
 # --- Management Delete View ---
-class ManagementDeleteView(LoginRequiredMixin, DeleteView):
+class ManagementDeleteView(LoginRequiredMixin, HTMXDeleteMixin, DeleteView):
     model = Management
+    delete_success_message = "La gestión ha sido eliminada exitosamente."
 
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
@@ -119,18 +106,11 @@ class ManagementDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse('management-list', args=[self.object.assignment_id])
-
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        assignment_id = self.object.assignment_id
-        response = super().delete(request, *args, **kwargs)
-        if self.request.headers.get('HX-Request') or self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return HttpResponse(status=204)
-        return response
     
-class ProgramEditView(LoginRequiredMixin, UpdateView):
+class ProgramEditView(LoginRequiredMixin, HTMXResponseMixin, UpdateView):
     model = Program
     form_class = ProgramForm
+    success_message = "El programa ha sido actualizado exitosamente."
 
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
@@ -142,12 +122,6 @@ class ProgramEditView(LoginRequiredMixin, UpdateView):
         kwargs['request'] = self.request
         return kwargs
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            return HttpResponse(status=204, headers={'HX-Trigger': 'reload-table'})
-        return response
-
     def get_success_url(self):
         return reverse_lazy('program-list')
 
@@ -155,14 +129,9 @@ class ProgramEditView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         return context
 
-class ProgramDeleteView(LoginRequiredMixin, DeleteView):
+class ProgramDeleteView(LoginRequiredMixin, HTMXDeleteMixin, DeleteView):
     model = Program
-
-    def delete(self, request, *args, **kwargs):
-        response = super().delete(request, *args, **kwargs)
-        if self.request.headers.get('HX-Request'):
-            return HttpResponse(status=204, headers={'HX-Trigger': 'reload-table'})
-        return response
+    delete_success_message = "El programa ha sido eliminado exitosamente."
 
     def get_success_url(self):
         return reverse_lazy('program-list')
@@ -177,8 +146,13 @@ class ProgramListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         titulo = self.request.GET.get('titulo', '').strip()
+        descripcion = self.request.GET.get('descripcion', '').strip()
+        
         if titulo:
             queryset = queryset.filter(title__icontains=titulo)
+        if descripcion:
+            queryset = queryset.filter(description__icontains=descripcion)
+            
         # Si quieres filtrar por supervisor, descomenta la siguiente línea:
         # queryset = queryset.filter(supervisor=self.request.user)
         return queryset.order_by('-id')
@@ -198,9 +172,11 @@ class ProgramListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
         # Puedes agregar más contexto si es necesario
         return context
 
-class ProgramCreateView(CreateView):
+class ProgramCreateView(LoginRequiredMixin, HTMXResponseMixin, CreateView):
     model = Program
     form_class = ProgramForm
+    success_message = "El programa ha sido creado exitosamente."
+    
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
             return ["programs/partials/program_create.html"]
@@ -210,13 +186,6 @@ class ProgramCreateView(CreateView):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            from django.http import HttpResponse
-            return HttpResponse(status=204, headers={'HX-Trigger': 'reload-table'})
-        return response
 
     def get_success_url(self):
         return reverse_lazy('program-list')
@@ -267,9 +236,11 @@ class AssignmentListView(LoginRequiredMixin, SmartPaginationMixin, ListView):
             context['program'] = None
         return context
 
-class AssignmentCreateView(LoginRequiredMixin, CreateView):
+class AssignmentCreateView(LoginRequiredMixin, HTMXResponseMixin, CreateView):
     model = Assignment
     form_class = AssignmentForm
+    success_message = "La asignación ha sido creada exitosamente."
+    
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
             return ["assignments/partials/assignment_create.html"]
@@ -282,21 +253,6 @@ class AssignmentCreateView(LoginRequiredMixin, CreateView):
             from django.shortcuts import get_object_or_404
             kwargs['program'] = get_object_or_404(Program, pk=program_id)
         return kwargs
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            # Cierra el modal y recarga la tabla
-            return HttpResponse(
-                '',
-                status=204,
-                headers={
-                    'HX-Trigger': 'assignmentCreated, reload-table',
-                    'HX-Reswap': 'none',
-                    'HX-Retarget': 'body'
-                }
-            )
-        return response
 
     def get_success_url(self):
         program_id = self.kwargs.get('program_id', None)
@@ -314,9 +270,10 @@ class AssignmentCreateView(LoginRequiredMixin, CreateView):
             context['program'] = None
         return context
 
-class AssignmentEditView(LoginRequiredMixin, UpdateView):
+class AssignmentEditView(LoginRequiredMixin, HTMXResponseMixin, UpdateView):
     model = Assignment
     form_class = AssignmentForm
+    success_message = "La asignación ha sido actualizada exitosamente."
 
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
@@ -342,31 +299,17 @@ class AssignmentEditView(LoginRequiredMixin, UpdateView):
             context['program'] = assignment.program if assignment and assignment.program_id else None
         return context
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            return HttpResponse(status=204, headers={'HX-Trigger': 'reload-table'})
-        return response
-
     def get_success_url(self):
         return reverse_lazy('assignment-list')
 
-class AssignmentDeleteView(LoginRequiredMixin, DeleteView):
+class AssignmentDeleteView(LoginRequiredMixin, HTMXDeleteMixin, DeleteView):
     model = Assignment
+    delete_success_message = "La asignación ha sido eliminada exitosamente."
+    
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
             return ["assignments/partials/assignment_delete.html"]
         return ["assignments/partials/assignment_confirm_delete.html"]
-
-    def delete(self, request, *args, **kwargs):
-        response = super().delete(request, *args, **kwargs)
-        # Support both HTMX and fetch/X-Requested-With AJAX
-        if (
-            self.request.headers.get('HX-Request') or
-            self.request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-        ):
-            return HttpResponse(status=204, headers={'HX-Trigger': 'reload-table'})
-        return response
 
     def get_success_url(self):
         return reverse_lazy('assignment-list')

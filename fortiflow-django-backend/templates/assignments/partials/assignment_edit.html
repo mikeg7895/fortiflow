@@ -1,11 +1,15 @@
 <h3 class="text-lg font-bold mb-4">Editar Asignación</h3>
-<form id="assignment-edit-form" method="post"
+<form id="assignment-edit-form" 
+      method="post"
+      data-form-type="assignment-edit"
     {% if program %}
         hx-post="{% url 'assignment-edit-program' form.instance.id program.id %}"
     {% else %}
         hx-post="{% url 'assignment-edit' form.instance.id %}"
     {% endif %}
-    hx-target="#modal-edit-assignment-form-content" hx-swap="outerHTML" class="space-y-4 mt-5">
+    hx-target="#modal-edit-assignment-form-content" 
+    hx-swap="outerHTML" 
+    class="space-y-4 mt-5">
     {% csrf_token %}
     {% if form.non_field_errors %}
     <div class="alert alert-error shadow-lg mb-4">
@@ -64,19 +68,7 @@
         document.getElementById('submit-spinner')?.classList.remove('hidden');
     });
 
-    document.body.addEventListener('htmx:afterOnLoad', function (evt) {
-        const status = evt.detail.xhr.status;
-        if (status === 204) {
-            if (typeof edit_assignment_modal !== 'undefined') {
-                edit_assignment_modal.close();
-            }
-            Swal.fire(
-                'Asignación editada',
-                'La asignación ha sido editada exitosamente.',
-                'success'
-            );
-            htmx.trigger('body', 'reload-table');
-        }
+    document.querySelector('form').addEventListener('htmx:afterRequest', function () {
         document.getElementById('submit-spinner')?.classList.add('hidden');
     });
 </script>

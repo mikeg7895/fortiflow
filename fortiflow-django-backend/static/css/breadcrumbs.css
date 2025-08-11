@@ -1,0 +1,209 @@
+/* Modern Breadcrumbs Styling */
+.breadcrumbs {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+}
+
+.breadcrumbs::-webkit-scrollbar {
+    display: none; /* WebKit */
+}
+
+.breadcrumbs ul {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap; /* Cambio: no wrap para evitar salto de línea */
+    gap: 0;
+    min-width: fit-content;
+    white-space: nowrap;
+}
+
+.breadcrumbs ul li {
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex-shrink: 0; /* Evita que se compriman */
+}
+
+/* Truncamiento de texto largo */
+.breadcrumbs ul li a span {
+    max-width: 200px; /* Límite de ancho para texto */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: top; /* Alineación mejor */
+}
+
+/* Tooltip para mostrar texto completo en hover */
+.breadcrumbs ul li a span[title] {
+    cursor: help;
+}
+
+/* Para pantallas grandes, permitir más texto */
+@media (min-width: 1200px) {
+    .breadcrumbs ul li a span {
+        max-width: 300px;
+    }
+}
+
+/* Para pantallas medianas */
+@media (min-width: 769px) and (max-width: 1199px) {
+    .breadcrumbs ul li a span {
+        max-width: 150px;
+    }
+}
+
+.breadcrumbs ul li:not(:last-child)::after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid #e5e7eb;
+    margin-left: 8px;
+    margin-right: 8px;
+    z-index: 1;
+}
+
+.breadcrumbs ul li a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    color: #64748b;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid #e2e8f0;
+    position: relative;
+}
+
+.breadcrumbs ul li:not(:last-child) a {
+    padding-right: 20px;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%, 8px 50%);
+    margin-right: -8px;
+}
+
+.breadcrumbs ul li:first-child a {
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+}
+
+.breadcrumbs ul li:last-child a {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border-color: #3b82f6;
+    clip-path: polygon(8px 0, 100% 0, 100% 100%, 8px 100%, 0 50%);
+    padding-left: 20px;
+    font-weight: 600;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+.breadcrumbs ul li a:hover:not(.current) {
+    background: #e2e8f0;
+    color: #475569;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.1);
+}
+
+.breadcrumbs ul li:last-child a:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px -2px rgba(59, 130, 246, 0.4);
+}
+
+.breadcrumbs ul li a i {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* Alternative modern style with separators */
+.breadcrumbs-alt ul li:not(:last-child)::after {
+    content: '›';
+    color: #cbd5e1;
+    margin: 0 12px;
+    font-size: 16px;
+    font-weight: 300;
+    border: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .breadcrumbs {
+        padding-bottom: 8px; /* Espacio para la sombra de scroll */
+        position: relative;
+    }
+    
+    /* Indicador de scroll en móviles */
+    .breadcrumbs::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 20px;
+        background: linear-gradient(to right, transparent, rgba(248, 250, 252, 0.8));
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .breadcrumbs.scrollable::after {
+        opacity: 1;
+    }
+    
+    .breadcrumbs ul {
+        padding-right: 20px; /* Espacio para el indicador de scroll */
+    }
+    
+    .breadcrumbs ul li a {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    .breadcrumbs ul li:not(:last-child) a {
+        padding-right: 18px;
+    }
+    
+    .breadcrumbs ul li:last-child a {
+        padding-left: 18px;
+    }
+    
+    .breadcrumbs ul li a span {
+        max-width: 120px;
+    }
+}
+
+/* Para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .breadcrumbs ul li a span {
+        max-width: 80px;
+    }
+    
+    .breadcrumbs ul li a {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+}
+
+/* Animation for breadcrumb items */
+.breadcrumbs ul li {
+    animation: breadcrumbFadeIn 0.3s ease-out forwards;
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.breadcrumbs ul li:nth-child(1) { animation-delay: 0.1s; }
+.breadcrumbs ul li:nth-child(2) { animation-delay: 0.2s; }
+.breadcrumbs ul li:nth-child(3) { animation-delay: 0.3s; }
+.breadcrumbs ul li:nth-child(4) { animation-delay: 0.4s; }
+.breadcrumbs ul li:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes breadcrumbFadeIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

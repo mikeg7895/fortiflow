@@ -2,7 +2,29 @@
 
 {% block title %}Clientes{% endblock %}
 
-{% block title-header %}Clientes{% endblock %}
+{% block page_title %}Clientes{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+    <span class="flex items-center gap-2 text-blue-600 font-semibold">
+        <i class="fas fa-users text-xs"></i>
+        <span>Clientes</span>
+    </span>
+</li>
+{% endblock %}
+
+{% block title-header %}
+<div class="flex items-center gap-3">
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-xl shadow-lg">
+        <i class="fas fa-users text-white text-xl"></i>
+    </div>
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Gestión de Clientes</h1>
+        <p class="text-sm text-gray-600">Administra tus clientes y contratos</p>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
 <div class="">  
@@ -14,7 +36,7 @@
         <div class="table-container">
             <div id="tabla-clientes"
                  hx-get="{% url 'client-list' %}" 
-                 hx-trigger="load, clientCreated from:body, reload-table from:body"
+                 hx-trigger="load, clientCreated from:body, reload-table from:body, contractListRefresh from:body"
                  hx-target="#tabla-clientes" 
                  hx-swap="innerHTML">
                 <div style="width: 100%; text-align: center; padding: 10px 5px; box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
@@ -30,4 +52,27 @@
 {% include "clients/contract_modal.html" %}
 {% include "clients/create_contract_modal.html" %}
 {% include "clients/edit_contract_modal.html" %}
+
+<script>
+    // Event listener global para cerrar modales cuando se recibe el trigger closeModal
+    document.body.addEventListener('closeModal', function() {
+        // Cerrar todos los modales de contratos
+        if (typeof create_contract_modal !== 'undefined') {
+            create_contract_modal.close();
+        }
+        if (typeof edit_contract_modal !== 'undefined') {
+            edit_contract_modal.close();
+        }
+        if (typeof list_contract_modal !== 'undefined') {
+            list_contract_modal.close();
+        }
+        // Cerrar modales de clientes también por si acaso
+        if (typeof add_client_modal !== 'undefined') {
+            add_client_modal.close();
+        }
+        if (typeof edit_client_modal !== 'undefined') {
+            edit_client_modal.close();
+        }
+    });
+</script>
 {% endblock %}

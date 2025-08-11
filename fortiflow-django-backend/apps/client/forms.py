@@ -54,6 +54,15 @@ class CreateClientForm(forms.ModelForm):
     
     def save(self, commit=True):
         client = super().save(commit=False)
+        
+        # Debug: Verificar que el request y user estén disponibles
+        if not self.request:
+            raise forms.ValidationError("Request no disponible en el formulario.")
+        if not hasattr(self.request.user, 'tenant'):
+            raise forms.ValidationError("El usuario no tiene un tenant asignado.")
+        if not self.request.user.tenant:
+            raise forms.ValidationError("El tenant del usuario es nulo.")
+            
         client.tenant = self.request.user.tenant
 
         logo = self.cleaned_data.get('logo')
@@ -69,7 +78,7 @@ class CreateClientForm(forms.ModelForm):
         if logo:
             if old_logo and old_logo.name == logo.name:
                 client.save()
-                return
+                return client
             
             name, ext = os.path.splitext(logo.name)
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -90,24 +99,31 @@ class CreateClientForm(forms.ModelForm):
 class CreateContractForm(forms.ModelForm):
     start_date = forms.DateField(
         label='Fecha de inicio',
-        widget=forms.DateInput(attrs={
-            'class': 'input input-bordered w-full',
-            'placeholder': 'Fecha de inicio',
-            'type': 'date',
-            'max': datetime.now().strftime('%Y-%m-%d'),
-        }),
+        widget=forms.DateInput(
+            attrs={
+                'class': 'input input-bordered w-full',
+                'placeholder': 'Fecha de inicio',
+                'type': 'date',
+            },
+            format='%Y-%m-%d'
+        ),
+        input_formats=['%Y-%m-%d'],
         error_messages={
             'required': 'La fecha de inicio es obligatoria.',
         }
     )
     end_date = forms.DateField(
         label='Fecha de finalización',
-        widget=forms.DateInput(attrs={
-            'class': 'input input-bordered w-full',
-            'placeholder': 'Fecha de finalización',
-            'type': 'date',
-            'min': datetime.now().strftime('%Y-%m-%d'),
-        }),
+        widget=forms.DateInput(
+            attrs={
+                'class': 'input input-bordered w-full',
+                'placeholder': 'Fecha de finalización',
+                'type': 'date',
+            },
+            format='%Y-%m-%d'
+        ),
+        input_formats=['%Y-%m-%d'],
+        required=False,
         error_messages={
             'required': 'La fecha de finalización es obligatoria.',
         }
@@ -120,12 +136,17 @@ class CreateContractForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.client = kwargs.pop('client', None)
         super().__init__(*args, **kwargs)
+        
+        # Solo aplicar restricciones para contratos nuevos
+        if not self.instance or not self.instance.pk:
+            self.fields['start_date'].widget.attrs['max'] = datetime.now().strftime('%Y-%m-%d')
+            self.fields['end_date'].widget.attrs['min'] = datetime.now().strftime('%Y-%m-%d')
 
     def save(self, commit=True):
         contract = super().save(commit=False)
-        if not contract.pk:
+        if not contract.pk and self.client:
             contract.client = self.client
         if commit:
             contract.save()
         return contract
-        
+

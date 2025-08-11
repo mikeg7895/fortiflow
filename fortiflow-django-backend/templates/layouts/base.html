@@ -10,7 +10,9 @@
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
       <link rel="stylesheet" href="{% static 'css/style.css' %}">
-      <script src="https://code.highcharts.com/highcharts.js"></script>
+      <link rel="stylesheet" href="{% static 'css/dropdown-fix.css' %}">
+      <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+      <script src="https://code.highcharts.com/12/highcharts.js"> </script>
   </head>
   <body class="flex h-screen bg-gray-100">
     <!-- Sidebar -->
@@ -129,7 +131,35 @@
             </div>
           </div>
       </div>
-      <hr style="margin: .6rem 0 2rem 0; color: #dedede;">
+      
+      <!-- Modern Breadcrumb Navigation -->
+      {% block breadcrumb %}
+      <div class="flex items-center justify-between mb-6 mt-4">
+        <div class="flex items-center space-x-2 text-sm overflow-hidden flex-1 mr-4">
+          <!-- Breadcrumb Links -->
+          <div class="breadcrumbs text-sm font-medium" id="breadcrumb-container">
+            <ul class="flex items-center space-x-2">
+              <li>
+                <a href="{% url 'dashboard' %}" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors duration-200">
+                  <i class="fas fa-home text-xs"></i>
+                  <span title="Dashboard">Dashboard</span>
+                </a>
+              </li>
+              {% block breadcrumb_items %}{% endblock %}
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Page Title -->
+        <div class="flex items-center gap-3 flex-shrink-0">
+          {% block title-header %}
+          <h1 class="text-2xl font-bold text-gray-800">{% block page_title %}Dashboard{% endblock %}</h1>
+          {% endblock %}
+        </div>
+      </div>
+      {% endblock %}
+      
+      <hr style="margin: 0 0 2rem 0; color: #dedede;">
       {% block content %}{% endblock %}
     </main>
     {% block scripts %}{% endblock %}
@@ -171,6 +201,26 @@
               }
           });
       }
+      
+      // Breadcrumb scroll handler
+      function handleBreadcrumbScroll() {
+          const breadcrumbContainer = document.getElementById('breadcrumb-container');
+          if (breadcrumbContainer) {
+              const ul = breadcrumbContainer.querySelector('ul');
+              if (ul && ul.scrollWidth > ul.clientWidth) {
+                  breadcrumbContainer.classList.add('scrollable');
+              } else {
+                  breadcrumbContainer.classList.remove('scrollable');
+              }
+          }
+      }
+      
+      // Initialize breadcrumb scroll on page load
+      document.addEventListener('DOMContentLoaded', handleBreadcrumbScroll);
+      window.addEventListener('resize', handleBreadcrumbScroll);
     </script>
+    
+    <!-- Sweet Alert Manager Global -->
+    <script src="{% static 'js/sweetalert-manager.js' %}"></script>
   </body>
 </html>

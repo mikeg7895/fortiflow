@@ -2,215 +2,554 @@
 
 {% block title %}Dashboard{% endblock %}
 
-{% block title-header %}Dashboard{% endblock %}
+{% block page_title %}Dashboard de Cobranza{% endblock %}
+
+{% block breadcrumb_items %}
+<!-- Dashboard es la página principal, no necesita items adicionales -->
+{% endblock %}
+
+{% block title-header %}
+<div class="flex items-center gap-3">
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl shadow-lg">
+        <i class="fas fa-chart-line text-white text-xl"></i>
+    </div>
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Dashboard de Cobranza</h1>
+        <p class="text-sm text-gray-600">Panel de control y estadísticas</p>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
 
-<div class="grid grid-cols-2 md:grid-cols-3 gap-7">
-    <div class="div1">
-        <h4>Resumen diario</h4>
-        <div class="card">
-            <div class="card-body">
-                <div class="card-da">
-                    <h1>$1.250.000</h1>
-                    <div class="da-body">
-                        <h3>Próximos por cobrar</h3>
-                    </div>
+<!-- KPI Cards Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Cartera Total -->
+    <div class="group relative overflow-hidden bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+        <div class="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+        <div class="relative p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-white/20 rounded-xl">
+                    <i class="fas fa-wallet text-2xl"></i>
+                </div>
+                <div class="text-right opacity-80">
+                    <div class="text-xs font-medium">CARTERA</div>
                 </div>
             </div>
+            <div class="space-y-1">
+                <div class="text-3xl font-bold">${{ total_balance|floatformat:0 }}</div>
+                <div class="text-sm opacity-90">{{ total_obligations }} obligaciones</div>
+                <div class="text-xs opacity-75">{{ total_debtors }} deudores</div>
+            </div>
         </div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-white/30 to-transparent"></div>
     </div>
-    <div class="div2">
-        <h4>Facturación pendiente</h4>
-        <div class="card">
-            <div class="card-body">
-                <div class="card-da">
-                    <h1>24</h1>
-                    <div class="da-body">
-                        <h3>Facturas pendientes</h3>
-                    </div>
+    
+    <!-- Cartera Vencida -->
+    <div class="group relative overflow-hidden bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+        <div class="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+        <div class="relative p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-white/20 rounded-xl">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                </div>
+                <div class="text-right opacity-80">
+                    <div class="text-xs font-medium">VENCIDA</div>
                 </div>
             </div>
+            <div class="space-y-1">
+                <div class="text-3xl font-bold">${{ overdue_amount|floatformat:0 }}</div>
+                <div class="text-sm opacity-90">{{ overdue_percentage }}% del total</div>
+                <div class="text-xs opacity-75">{{ overdue_count }} obligaciones</div>
+            </div>
         </div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-white/30 to-transparent"></div>
     </div>
-    <div class="div3">
-        <h4>Progreso mensual</h4>
-        <div class="card">
-            <div class="card-body">
-                <div class="card-da">
-                    <h1>72%</h1>
-                    <div class="da-body">
-                        <h3>Proximos por cobrar</h3>
-                    </div>
+    
+    <!-- Por Vencer -->
+    <div class="group relative overflow-hidden bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+        <div class="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+        <div class="relative p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-white/20 rounded-xl">
+                    <i class="fas fa-clock text-2xl"></i>
+                </div>
+                <div class="text-right opacity-80">
+                    <div class="text-xs font-medium">POR VENCER</div>
                 </div>
             </div>
+            <div class="space-y-1">
+                <div class="text-3xl font-bold">${{ upcoming_amount|floatformat:0 }}</div>
+                <div class="text-sm opacity-90">Próximos 30 días</div>
+                <div class="text-xs opacity-75">{{ upcoming_count }} obligaciones</div>
+            </div>
         </div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-white/30 to-transparent"></div>
+    </div>
+    
+    <!-- Recuperado -->
+    <div class="group relative overflow-hidden bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+        <div class="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+        <div class="relative p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-white/20 rounded-xl">
+                    <i class="fas fa-hand-holding-usd text-2xl"></i>
+                </div>
+                <div class="text-right opacity-80">
+                    <div class="text-xs font-medium">RECUPERADO</div>
+                </div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-3xl font-bold">${{ monthly_recovered_amount|floatformat:0 }}</div>
+                <div class="text-sm opacity-90">Este mes</div>
+                <div class="text-xs opacity-75">{{ monthly_recovered_count }} pagos</div>
+            </div>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-white/30 to-transparent"></div>
     </div>
 </div>
-<div class="grid grid-cols-2 md:grid-cols-3 gap-7 mt-7">
-    <div class="div4 col-span-1">
-        <h4>Recuperación mensual</h4>
-        <div class="card">
-            <div class="card-body">
-                <div id="container1"></div>
-            </div>
-        </div>
-    </div>
-    <div class="div5 col-span-1 md:col-span-2">
-        <h4>Próximos cobros</h4>
-        <div class="card">
-            <div class="card-body">
-                <h3>Próximos por cobrar</h3>
-                <table class="custom-table">
-                    <tbody>
-                        <tr>
-                            <td><i class="fa-solid fa-calendar" style="margin-right: 12px;"></i>Ana Perez</td>
-                            <td>$350.000</td>
-                            <td>24 Jul</td>
-                        </tr>
-                        <tr>
-                            <td><i class="fa-solid fa-calendar" style="margin-right: 12px;"></i>Carlos Ruiz</td>
-                            <td>$120.000</td>
-                            <td>25 Jul</td>
-                        </tr>
-                        <tr>
-                            <td><i class="fa-solid fa-calendar" style="margin-right: 12px;"></i>Jorge Mena</td>
-                            <td>$870.000</td>
-                            <td>27 Jul</td>
-                        </tr>
-                        <tr>
-                            <td><i class="fa-solid fa-calendar" style="margin-right: 12px;"></i>Stephen Perez</td>
-                            <td>$600.000</td>
-                            <td>28 Jul</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card mt-7">
-            <div class="card-body">
-                <div id="container"></div>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        Highcharts.chart('container', {
-            chart: {
-                type: 'line'
-            },
-            title: {
-                text: 'Monthly Average Temperature'
-            },
-            subtitle: {
-                text: 'Source: ' +
-                    '<a href="https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature" ' +
-                    'target="_blank">Wikipedia.com</a>'
-            },
-            xAxis: {
-                categories: [
-                    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
-                    'Oct', 'Nov', 'Dec'
-                ]
-            },
-            yAxis: {
-                title: {
-                    text: 'Temperature (°C)'
-                }
-            },
-            plotOptions: {
-                line: {
-                    dataLabels: {
-                        enabled: true
-                    },
-                    enableMouseTracking: false
-                }
-            },
-            series: [{
-                name: 'Reggane',
-                data: [
-                    16.0, 18.2, 23.1, 27.9, 32.2, 36.4, 39.8, 38.4, 35.5, 29.2,
-                    22.0, 17.8
-                ]
-            }, {
-                name: 'Tallinn',
-                data: [
-                    -2.9, -3.6, -0.6, 4.8, 10.2, 14.5, 17.6, 16.5, 12.0, 6.5,
-                    2.0, -0.9
-                ]
-            }]
-        });
 
-        Highcharts.chart('container1', {
+<!-- Secondary KPIs -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="flex items-center gap-4">
+            <div class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl text-white">
+                <i class="fas fa-briefcase text-xl"></i>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-gray-800">{{ active_portfolios }}</div>
+                <div class="text-sm text-gray-600">Portfolios Activos</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="flex items-center gap-4">
+            <div class="p-3 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl text-white">
+                <i class="fas fa-calendar-times text-xl"></i>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-gray-800">{{ avg_delinquency_days }}</div>
+                <div class="text-sm text-gray-600">Promedio Días Mora</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="flex items-center gap-4">
+            <div class="p-3 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl text-white">
+                <i class="fas fa-tasks text-xl"></i>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-gray-800">{{ active_assignments }}</div>
+                <div class="text-sm text-gray-600">Asignaciones Activas</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="flex items-center gap-4">
+            <div class="p-3 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl text-white">
+                <i class="fas fa-cog text-xl"></i>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-gray-800">{{ monthly_managements }}</div>
+                <div class="text-sm text-gray-600">Gestiones del Mes</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Recovery Chart -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg text-white">
+                    <i class="fas fa-chart-area text-sm"></i>
+                </div>
+                <h3 class="font-bold text-gray-800">Recuperación Mensual</h3>
+            </div>
+        </div>
+        <div class="p-6">
+            <div id="recoveryChart" style="height: 300px;"></div>
+        </div>
+    </div>
+    
+    <!-- Portfolio Distribution -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg text-white">
+                    <i class="fas fa-chart-pie text-sm"></i>
+                </div>
+                <h3 class="font-bold text-gray-800">Distribución por Tipo</h3>
+            </div>
+        </div>
+        <div class="p-6">
+            <div id="portfolioChart" style="height: 300px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Tables Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Upcoming Obligations -->
+    <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg text-white">
+                    <i class="fas fa-clock text-sm"></i>
+                </div>
+                <h3 class="font-bold text-gray-800">Próximos Vencimientos</h3>
+                <span class="ml-auto px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-medium">
+                    Próximos 7 días
+                </span>
+            </div>
+        </div>
+        <div class="overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deudor</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimiento</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Urgencia</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for obligation in upcoming_obligations %}
+                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full text-white text-xs">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ obligation.debtor.name }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-bold text-amber-600">${{ obligation.balance|floatformat:0 }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-600">{{ obligation.expiration_date|date:"M d, Y" }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if obligation.expiration_date <= today %}
+                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>Vencido
+                                </span>
+                            {% else %}
+                                <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                                    <i class="fas fa-clock mr-1"></i>Próximo
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                            <i class="fas fa-calendar-check text-3xl mb-2 opacity-50"></i>
+                            <div>No hay vencimientos próximos</div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Top Agents -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg text-white">
+                    <i class="fas fa-trophy text-sm"></i>
+                </div>
+                <h3 class="font-bold text-gray-800">Top Agentes</h3>
+            </div>
+        </div>
+        <div class="p-4 space-y-3">
+            {% for agent in top_agents %}
+            <div class="flex items-center p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:from-purple-50 hover:to-purple-100 transition-all duration-300">
+                <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    {{ forloop.counter }}
+                </div>
+                <div class="ml-4 flex-1">
+                    <div class="text-sm font-semibold text-gray-900">
+                        {{ agent.agent__first_name }} {{ agent.agent__last_name }}
+                    </div>
+                    <div class="text-xs text-gray-600">
+                        {{ agent.assignment_count }} asignaciones
+                    </div>
+                </div>
+                <div class="flex-shrink-0">
+                    <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                        #{{ forloop.counter }}
+                    </span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-users text-3xl mb-2 opacity-50"></i>
+                <div>No hay datos de agentes</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Portfolio Stats Table -->
+<div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+    <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg text-white">
+                <i class="fas fa-chart-bar text-sm"></i>
+            </div>
+            <h3 class="font-bold text-gray-800">Estadísticas por Tipo de Cartera</h3>
+        </div>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Obligaciones</th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto Original</th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo Pendiente</th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Participación</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for stat in portfolio_type_stats %}
+                <tr class="hover:bg-gray-50 transition-colors duration-200">
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 bg-gradient-to-r from-indigo-100 to-indigo-200 text-indigo-800 rounded-full text-sm font-medium">
+                            {{ stat.type_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ stat.count }}</td>
+                    <td class="px-6 py-4 text-sm font-bold text-emerald-600">${{ stat.total_amount|floatformat:0 }}</td>
+                    <td class="px-6 py-4 text-sm font-bold text-blue-600">${{ stat.total_balance|floatformat:0 }}</td>
+                    <td class="px-6 py-4">
+                        {% if total_balance > 0 %}
+                        <div class="flex items-center space-x-2">
+                            <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 h-2 rounded-full" 
+                                     style="width: {% widthratio stat.total_balance total_balance 100 %}%"></div>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700">
+                                {% widthratio stat.total_balance total_balance 100 %}%
+                            </span>
+                        </div>
+                        {% else %}
+                        <span class="text-sm text-gray-500">0%</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                        <i class="fas fa-chart-bar text-3xl mb-2 opacity-50"></i>
+                        <div>No hay datos disponibles</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Charts JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@latest"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Recovery Chart
+    const recoveryOptions = {
+        series: [{
+            name: 'Recuperación Mensual',
+            data: {{ recovered_data|safe }}
+        }],
+        chart: {
+            type: 'area',
+            height: 300,
+            toolbar: { show: false },
+            fontFamily: 'Inter, sans-serif'
+        },
+        dataLabels: { enabled: false },
+        stroke: {
+            curve: 'smooth',
+            width: 3
+        },
+        colors: ['#10B981'],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shade: 'light',
+                type: 'vertical',
+                shadeIntensity: 0.5,
+                gradientToColors: ['#34D399'],
+                inverseColors: false,
+                opacityFrom: 0.8,
+                opacityTo: 0.1
+            }
+        },
+        grid: {
+            borderColor: '#F3F4F6',
+            strokeDashArray: 5
+        },
+        xaxis: {
+            categories: {{ chart_months|safe }},
+            labels: {
+                style: { colors: '#6B7280', fontSize: '12px' }
+            }
+        },
+        yaxis: {
+            labels: {
+                style: { colors: '#6B7280', fontSize: '12px' },
+                formatter: function (value) {
+                    return '$' + value.toLocaleString();
+                }
+            }
+        },
+        tooltip: {
+            theme: 'light',
+            y: {
+                formatter: function (value) {
+                    return '$' + value.toLocaleString();
+                }
+            }
+        }
+    };
+    
+    const recoveryChart = new ApexCharts(document.querySelector("#recoveryChart"), recoveryOptions);
+    recoveryChart.render();
+    
+    // Portfolio Distribution Chart
+    const portfolioData = {{ portfolio_chart_data|safe }};
+    if (portfolioData.length > 0) {
+        const portfolioOptions = {
+            series: portfolioData.map(item => item.value),
             chart: {
-                type: 'bar'
+                type: 'donut',
+                height: 300,
+                fontFamily: 'Inter, sans-serif'
             },
-            title: {
-                text: 'Historic World Population by Region'
-            },
-            subtitle: {
-                text: 'Source: <a ' +
-                    'href="https://en.wikipedia.org/wiki/List_of_continents_and_continental_subregions_by_population"' +
-                    'target="_blank">Wikipedia.org</a>'
-            },
-            xAxis: {
-                categories: ['Africa', 'America', 'Asia', 'Europe'],
-                title: {
-                    text: null
-                },
-                gridLineWidth: 1,
-                lineWidth: 0
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: 'Population (millions)',
-                    align: 'high'
-                },
-                labels: {
-                    overflow: 'justify'
-                },
-                gridLineWidth: 0
-            },
-            tooltip: {
-                valueSuffix: ' millions'
-            },
+            labels: portfolioData.map(item => item.name),
+            colors: ['#3B82F6', '#EF4444', '#F59E0B'],
             plotOptions: {
-                bar: {
-                    borderRadius: '50%',
-                    dataLabels: {
-                        enabled: true
-                    },
-                    groupPadding: 0.1
+                pie: {
+                    donut: {
+                        size: '65%',
+                        labels: {
+                            show: true,
+                            name: {
+                                show: true,
+                                fontSize: '14px',
+                                fontWeight: 600,
+                                color: '#374151'
+                            },
+                            value: {
+                                show: true,
+                                fontSize: '16px',
+                                fontWeight: 700,
+                                color: '#111827',
+                                formatter: function (val) {
+                                    return '$' + parseFloat(val).toLocaleString();
+                                }
+                            },
+                            total: {
+                                show: true,
+                                label: 'Total',
+                                fontSize: '14px',
+                                fontWeight: 600,
+                                color: '#6B7280',
+                                formatter: function (w) {
+                                    const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                    return '$' + total.toLocaleString();
+                                }
+                            }
+                        }
+                    }
                 }
             },
             legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'top',
-                x: -40,
-                y: 80,
-                floating: true,
-                borderWidth: 1,
-                backgroundColor: 'var(--highcharts-background-color, #ffffff)',
-                shadow: true
+                position: 'bottom',
+                fontSize: '14px',
+                fontWeight: 500,
+                labels: { colors: '#374151' }
             },
-            credits: {
-                enabled: false
-            },
-            series: [{
-                name: 'Year 1990',
-                data: [632, 727, 3202, 721]
-            }, {
-                name: 'Year 2000',
-                data: [814, 841, 3714, 726]
-            }, {
-                name: 'Year 2021',
-                data: [1393, 1031, 4695, 745]
-            }]
-        });
-    });
+            tooltip: {
+                y: {
+                    formatter: function (value) {
+                        return '$' + value.toLocaleString();
+                    }
+                }
+            }
+        };
+        
+        const portfolioChart = new ApexCharts(document.querySelector("#portfolioChart"), portfolioOptions);
+        portfolioChart.render();
+    } else {
+        document.querySelector("#portfolioChart").innerHTML = 
+            '<div class="flex items-center justify-center h-full text-gray-500">' +
+            '<div class="text-center">' +
+            '<i class="fas fa-chart-pie text-3xl mb-2 opacity-50"></i>' +
+            '<div>No hay datos para mostrar</div>' +
+            '</div></div>';
+    }
+});
 </script>
+
+<style>
+/* Animaciones personalizadas */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+.card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Efectos de hover mejorados */
+.group:hover .absolute.inset-0 {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #1d4ed8, #1e40af);
+}
+</style>
 
 {% endblock %}

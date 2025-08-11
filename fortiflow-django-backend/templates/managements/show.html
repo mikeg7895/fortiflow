@@ -2,7 +2,36 @@
 
 {% block title %}Gestiones{% endblock %}
 
-{% block title-header %}Gestiones{% endblock %}
+{% block page_title %}Gestiones{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+    <a href="{% url 'assignment-list' %}" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors duration-200">
+        <i class="fas fa-tasks text-xs"></i>
+        <span title="Asignaciones">Asignaciones</span>
+    </a>
+</li>
+<li>
+    <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+    <span class="flex items-center gap-2 text-blue-600 font-semibold">
+        <i class="fas fa-clipboard-list text-xs"></i>
+        <span title="Gestión #{{ assignment.id }}">Gestión #{{ assignment.id }}</span>
+    </span>
+</li>
+{% endblock %}
+
+{% block title-header %}
+<div class="flex items-center gap-3">
+    <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-3 rounded-xl shadow-lg">
+        <i class="fas fa-clipboard-list text-white text-xl"></i>
+    </div>
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Gestiones</h1>
+        <p class="text-sm text-gray-600">Asignación #{{ assignment.id }}</p>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
 <div class="card card-border bg-base-100">  

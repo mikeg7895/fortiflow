@@ -1,6 +1,57 @@
 {% load pagination_tags %}
 
-<table class="custom-table">
+<form method="get" hx-get="{% url 'user-list' %}" hx-trigger="input delay:500ms from:input, submit" hx-target="#tabla-usuarios" hx-swap="innerHTML" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
+    <div class="flex flex-wrap gap-4 items-end">
+        <div class="min-w-[200px]">
+            <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Usuario:</label>
+            <input type="text" 
+                   name="username" 
+                   id="username" 
+                   value="{{ request.GET.username }}" 
+                   placeholder="Nombre de usuario..."
+                   class="input input-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+        </div>
+        
+        <div class="min-w-[200px]">
+            <label for="nombre" class="block text-sm font-medium text-gray-700 mb-2">Nombre:</label>
+            <input type="text" 
+                   name="nombre" 
+                   id="nombre" 
+                   value="{{ request.GET.nombre }}" 
+                   placeholder="Primer nombre..."
+                   class="input input-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+        </div>
+        
+        <div class="min-w-[200px]">
+            <label for="apellido" class="block text-sm font-medium text-gray-700 mb-2">Apellido:</label>
+            <input type="text" 
+                   name="apellido" 
+                   id="apellido" 
+                   value="{{ request.GET.apellido }}" 
+                   placeholder="Apellido..."
+                   class="input input-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+        </div>
+        
+        <div class="min-w-[250px]">
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email:</label>
+            <input type="text" 
+                   name="email" 
+                   id="email" 
+                   value="{{ request.GET.email }}" 
+                   placeholder="Correo electrónico..."
+                   class="input input-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search mr-2"></i>
+                Buscar
+            </button>
+        </div>
+    </div>
+</form>
+
+<table class="custom-table" id="tabla-usuarios">
     <thead>
         <tr>
             <th></th>
@@ -28,17 +79,33 @@
                 <td class="relative">
                     <div class="relative inline-block text-left group">
                         <!-- Botón de los 3 puntos -->
-                        <button type="button" class="peer p-2" style="cursor: pointer;">
-                            <i class="fas fa-ellipsis-v"></i>
+                        <button type="button" class="peer p-2 tooltip" data-tip="Más acciones" style="cursor: pointer;">
+                            <i class="fas fa-ellipsis-v text-gray-600"></i>
                         </button>
 
                         <!-- Dropdown -->
                         <div class="absolute z-10 hidden group-focus-within:block dropdown-main">
                             <li>
-                                <button style="cursor: pointer;" hx-get="{% url 'user-edit' user.id %}" hx-target="#modal-edit-form-content" hx-trigger="click" onclick="edit_user_modal.showModal()">Editar</button>
+                                <button class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 w-full text-left" 
+                                        style="cursor: pointer;" 
+                                        hx-get="{% url 'user-edit' user.id %}" 
+                                        hx-target="#modal-edit-form-content" 
+                                        hx-trigger="click" 
+                                        onclick="edit_user_modal.showModal()">
+                                    <i class="fas fa-edit text-blue-500 text-sm"></i>
+                                    <span>Editar</span>
+                                </button>
                             </li>
                             <li>
-                                <button style="cursor: pointer;" onclick="confirmDeleteUser({{ user.id }})">Eliminar</button>
+                                <button class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 w-full text-left" 
+                                        style="cursor: pointer;" 
+                                        hx-delete="{% url 'user-delete' user.id %}"
+                                        hx-target="body"
+                                        hx-swap="none"
+                                        data-form-type="user-delete">
+                                    <i class="fas fa-trash-alt text-red-500 text-sm"></i>
+                                    <span>Eliminar</span>
+                                </button>
                             </li>
                         </div>
                     </div>
@@ -54,34 +121,3 @@
 {% if is_paginated %}
     {% smart_pagination page_obj "#tabla-usuarios" %}
 {% endif %}
-
-<script>
-    function confirmDeleteUser(userId) {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: 'Esta acción eliminará al usuario permanentemente.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                htmx.ajax('DELETE', `/account/delete/${userId}/`, {
-                    target: 'body',
-                    swap: 'none'  
-                });
-            }
-        });
-    }
-
-    document.body.addEventListener('userDeleted', () => {
-        htmx.trigger('body', 'userUpdated');
-        Swal.fire(
-            'Eliminado',
-            'El usuario ha sido eliminado.',
-            'success'
-        );
-    });
-</script>

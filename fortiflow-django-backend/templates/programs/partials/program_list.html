@@ -1,10 +1,38 @@
 </table>
 
 {% load pagination_tags %}
-<form method="get" hx-get="{% url 'program-list' %}" hx-target="#tabla-programas" hx-swap="innerHTML" class="grid grid-cols-2 md:grid-cols-5 gap-4 p-5">
-    <input type="text" name="titulo" value="{{ request.GET.titulo }}" placeholder="Buscar por título" class="input input-bordered w-full max-w-xs" />
-    <button type="submit" class="btn btn-primary w-fit">Filtrar</button>
+
+<form method="get" hx-get="{% url 'program-list' %}" hx-trigger="input delay:500ms from:input, submit" hx-target="#tabla-programas" hx-swap="innerHTML" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
+    <div class="flex flex-wrap gap-4 items-end">
+        <div class="min-w-[300px]">
+            <label for="titulo" class="block text-sm font-medium text-gray-700 mb-2">Buscar por título:</label>
+            <input type="text" 
+                   name="titulo" 
+                   id="titulo" 
+                   value="{{ request.GET.titulo }}" 
+                   placeholder="Escriba el título del programa..."
+                   class="input input-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+        </div>
+        
+        <div class="min-w-[300px]">
+            <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-2">Buscar por descripción:</label>
+            <input type="text" 
+                   name="descripcion" 
+                   id="descripcion" 
+                   value="{{ request.GET.descripcion }}" 
+                   placeholder="Escriba la descripción..."
+                   class="input input-bordered w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search mr-2"></i>
+                Buscar
+            </button>
+        </div>
+    </div>
 </form>
+
 <table class="custom-table" id="tabla-programas">
     <thead>
         <tr>
@@ -23,21 +51,48 @@
             <td>{{ program.description|truncatechars:30 }}</td>
             <td>{{ program.supervisor }}</td>
             <td>
-                <button class="btn btn-xs btn-warning" 
-                    hx-get="{% url 'program-edit' program.id %}"
-                    hx-target="#modal-edit-program-form-content"
-                    hx-swap="innerHTML"
-                    hx-trigger="click"
-                    onclick="edit_program_modal.showModal()">
-                    Editar
-                </button>
-                <button class="btn btn-xs btn-error" 
-                    onclick="openDeleteProgramModal('{{ program.id }}')">
-                    Eliminar
-                </button>
-                <a href="{% url 'assignment-list-program' program.id %}" class="btn btn-xs btn-info ml-1">
-                    <i class="fa fa-link"></i> Asignaciones
-                </a>
+                <div class="relative group">
+                    <!-- Botón de los 3 puntos -->
+                    <button type="button" class="peer p-2 tooltip" data-tip="Más acciones" style="cursor: pointer;">
+                        <i class="fas fa-ellipsis-v text-gray-600"></i>
+                    </button>
+
+                    <!-- Dropdown -->
+                    <div class="absolute right-0 z-50 hidden group-focus-within:block dropdown-main bg-white shadow-lg rounded-lg border min-w-[170px]">
+                        <ul class="py-2">
+                            <li>
+                                <button class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left text-sm" 
+                                        style="cursor: pointer;"
+                                        hx-get="{% url 'program-edit' program.id %}"
+                                        hx-target="#modal-edit-program-form-content"
+                                        hx-swap="innerHTML"
+                                        hx-trigger="click"
+                                        onclick="edit_program_modal.showModal()">
+                                    <i class="fas fa-edit text-blue-500"></i>
+                                    <span>Editar</span>
+                                </button>
+                            </li>
+                            <li>
+                                <a href="{% url 'assignment-list-program' program.id %}" 
+                                   class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 w-full text-left text-sm">
+                                    <i class="fas fa-link text-green-500"></i>
+                                    <span>Ver asignaciones</span>
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="my-1">
+                            </li>
+                            <li>
+                                <button class="flex items-center gap-3 px-4 py-2 hover:bg-red-50 w-full text-left text-sm" 
+                                        style="cursor: pointer;" 
+                                        onclick="openDeleteProgramModal('{{ program.id }}')">
+                                    <i class="fas fa-trash-alt text-red-500"></i>
+                                    <span class="text-red-600">Eliminar</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </td>
         </tr>
         {% empty %}
@@ -51,20 +106,4 @@
     {% smart_pagination page_obj "#tabla-programs" %}
 {% endif %}
 
-<script>
-    document.body.addEventListener('htmx:afterOnLoad', function(e) {
-        const trigger = e.detail.xhr.getResponseHeader('HX-Trigger');
-        if (trigger === 'programCreated') {
-            add_program_modal.close();
-            Swal.fire('¡Creado!', 'El programa ha sido creado exitosamente.', 'success');
-            htmx.trigger(document.body, 'programCreated');
-        } else if (trigger === 'programUpdated') {
-            add_program_modal.close();
-            Swal.fire('¡Actualizado!', 'El programa ha sido actualizado.', 'success');
-            htmx.trigger(document.body, 'programUpdated');
-        } else if (trigger === 'programDeleted') {
-            Swal.fire('¡Eliminado!', 'El programa ha sido eliminado.', 'success');
-            htmx.trigger(document.body, 'programDeleted');
-        }
-    });
-</script>
+

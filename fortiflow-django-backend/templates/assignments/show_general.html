@@ -2,7 +2,29 @@
 
 {% block title %}Asignaciones{% endblock %}
 
-{% block title-header %}Asignaciones{% endblock %}
+{% block page_title %}Asignaciones{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
+    <span class="flex items-center gap-2 text-blue-600 font-semibold">
+        <i class="fas fa-tasks text-xs"></i>
+        <span>Asignaciones</span>
+    </span>
+</li>
+{% endblock %}
+
+{% block title-header %}
+<div class="flex items-center gap-3">
+    <div class="bg-gradient-to-r from-orange-600 to-red-600 p-3 rounded-xl shadow-lg">
+        <i class="fas fa-tasks text-white text-xl"></i>
+    </div>
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Todas las Asignaciones</h1>
+        <p class="text-sm text-gray-600">Gestión completa de asignaciones</p>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
 <div class="">  

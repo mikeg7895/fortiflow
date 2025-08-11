@@ -1,5 +1,10 @@
 <h3 class="text-lg font-bold">Editar cliente</h3>
-<form method="post" hx-post="{% url 'client-edit' form.instance.pk %}" hx-target="#modal-edit-form-content" class="space-y-4 mt-5" enctype="multipart/form-data">
+<form method="post" 
+      hx-post="{% url 'client-edit' form.instance.pk %}" 
+      hx-target="#modal-edit-form-content" 
+      data-form-type="client-edit"
+      class="space-y-4 mt-5" 
+      enctype="multipart/form-data">
     {% csrf_token %}
     
     {% if form.non_field_errors %}
@@ -58,19 +63,8 @@
     document.querySelector('form').addEventListener('htmx:beforeRequest', function() {
         document.getElementById('submit-edit-spinner').classList.remove('hidden');
     });
-
-    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
-        const status = evt.detail.xhr.status;
-        if (status === 204) {
-            edit_client_modal.close();
-            Swal.fire(
-                'Cliente editado',
-                'El cliente ha sido editado exitosamente.',
-                'success'
-            );
-            htmx.trigger('#tabla-clientes', 'reload-table');
-        }
-
+    
+    document.querySelector('form').addEventListener('htmx:afterRequest', function() {
         document.getElementById('submit-edit-spinner').classList.add('hidden');
     });
 </script>
