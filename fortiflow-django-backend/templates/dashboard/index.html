@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<div class="parent">
+<div class="grid grid-cols-2 md:grid-cols-3 gap-7">
     <div class="div1">
         <h4>Resumen diario</h4>
         <div class="card">
@@ -46,7 +46,9 @@
             </div>
         </div>
     </div>
-    <div class="div4">
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-7 mt-7">
+    <div class="div4 col-span-1">
         <h4>Recuperación mensual</h4>
         <div class="card">
             <div class="card-body">
@@ -54,7 +56,7 @@
             </div>
         </div>
     </div>
-    <div class="div5">
+    <div class="div5 col-span-1 md:col-span-2">
         <h4>Próximos cobros</h4>
         <div class="card">
             <div class="card-body">
@@ -85,15 +87,15 @@
                 </table>
             </div>
         </div>
-    </div>
-    <div class="div6">
-        <div class="card">
+        <div class="card mt-7">
             <div class="card-body">
                 <div id="container"></div>
             </div>
         </div>
     </div>
-    <script>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
         Highcharts.chart('container', {
             chart: {
                 type: 'line'
@@ -208,7 +210,7 @@
                 data: [1393, 1031, 4695, 745]
             }]
         });
-    </script>
-</div>
+    });
+</script>
 
 {% endblock %}

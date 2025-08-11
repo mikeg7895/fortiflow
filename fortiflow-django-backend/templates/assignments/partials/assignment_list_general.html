@@ -1,9 +1,9 @@
 {% load pagination_tags %}
-<form method="get" hx-get="" hx-target="#tabla-assignments-general" hx-swap="innerHTML" class="flex flex-wrap gap-4 mb-4">
+<form method="get" hx-get="" hx-target="#tabla-assignments-general" hx-swap="innerHTML" class="grid grid-cols-2 md:grid-cols-5 gap-4 p-5">
     <input type="text" name="programa" value="{{ request.GET.programa }}" placeholder="Buscar por programa" class="input input-bordered w-full max-w-xs" />
     <input type="text" name="agente" value="{{ request.GET.agente }}" placeholder="Buscar por agente" class="input input-bordered w-full max-w-xs" />
     <input type="text" name="deudor" value="{{ request.GET.deudor }}" placeholder="Buscar por deudor" class="input input-bordered w-full max-w-xs" />
-    <button type="submit" class="btn btn-primary">Filtrar</button>
+    <button type="submit" class="btn btn-primary w-fit">Filtrar</button>
 </form>
 <table class="custom-table" id="tabla-assignments-general">
     <thead>

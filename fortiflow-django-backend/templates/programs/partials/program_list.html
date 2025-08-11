@@ -1,9 +1,9 @@
 </table>
 
 {% load pagination_tags %}
-<form method="get" hx-get="{% url 'program-list' %}" hx-target="#tabla-programas" hx-swap="innerHTML" class="flex flex-wrap gap-4 mb-4">
+<form method="get" hx-get="{% url 'program-list' %}" hx-target="#tabla-programas" hx-swap="innerHTML" class="grid grid-cols-2 md:grid-cols-5 gap-4 p-5">
     <input type="text" name="titulo" value="{{ request.GET.titulo }}" placeholder="Buscar por título" class="input input-bordered w-full max-w-xs" />
-    <button type="submit" class="btn btn-primary">Filtrar</button>
+    <button type="submit" class="btn btn-primary w-fit">Filtrar</button>
 </form>
 <table class="custom-table" id="tabla-programas">
     <thead>
